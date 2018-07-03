@@ -1,30 +1,16 @@
 #!/bin/bash -eux
 
 # Use commandline arguments first. If not found use env vars.
-NAMESPACE_NAME=$1 
-CLUSTER_NAME=$2
+
 INGRESS_IP=127.0.0.1 # default...
-
-if [ -z "$1" ]
-  then
-    NAMESPACE_NAME=$(NAMESPACE)
-fi
-
-if [ -z "$2" ]
-  then
-    CLUSTER_NAME=$(CLUSTER)
-fi
-
-if [ -z "$1" ]
-  then
-    echo "Missing namespace. Exiting."
-    exit 1
-fi
-
-if [ -z "$2" ]
-  then
-    echo "Missing cluster. Exiting."
-    exit 1
+if test "$#" -eq 2; then
+    NAMESPACE_NAME=$1
+    CLUSTER_NAME=$2
+    echo "Using commandline arguments namespace=$NAMESPACE_NAME cluster=$CLUSTER_NAME"
+  else
+    NAMESPACE_NAME=$NAMESPACE
+    CLUSTER_NAME=$CLUSTER
+    echo "Using environment var namespace=$NAMESPACE_NAME cluster=$CLUSTER_NAME"
 fi
 
 # Get cluster password and set auth for convenience
@@ -53,12 +39,13 @@ install_cje() {
 
 # installs ingress controller if it doesn't already exist
 install_ingress_controller(){
-  if [[ -z $(kubectl get namespace | grep ingress-nginx ) ]]; then
-    echo "Installing ingress controller"
-    curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml | kubectl apply -f -
-
-    curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/provider/cloud-generic.yaml | kubectl apply -f -
-  fi
+if [[ -z $(kubectl get namespace | grep ingress-nginx ) ]]; then
+  curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml | kubectl apply -f -
+  curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/provider/cloud-generic.yaml | kubectl apply -f -
+  echo "Installed ingress controller."
+else
+  echo "Ingress controller already exists."
+fi
 
   # Set and check the ingress ip
   while [[ "$(kubectl get svc ingress-nginx -n ingress-nginx  -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" = '' ]]; do sleep 3; done
@@ -103,14 +90,26 @@ retry_command() {
 
 # Configure GKE cluster to be ready for CJE
 gcloud container clusters get-credentials "$CLUSTER_NAME"
-kubectl create clusterrolebinding cluster-admin-binding  --clusterrole cluster-admin  --user $(gcloud config get-value account)
+CLUSTERROLES=$(kubectl get clusterrolebinding)
+if echo "$CLUSTERROLES" | grep "cluster-admin-binding"; then
+  echo "cluster-admin-binding role exists."
+else
+  kubectl create clusterrolebinding cluster-admin-binding  --clusterrole cluster-admin  --user $(gcloud config get-value account)
+  echo "Created role cluster-admin-binding."
+fi
 
 # Install ingress controller and get IP
 install_ingress_controller
 
 # Create namespace 
-kubectl create namespace "$NAMESPACE_NAME"
-kubectl label namespace "$NAMESPACE_NAME" name="$NAMESPACE_NAME"
+NAMESPACES=$(kubectl get namespaces)
+if echo "$NAMESPACES" | grep "$NAMESPACE_NAME"; then
+  echo "$NAMESPACE_NAME namespace exists."
+else
+  kubectl create namespace "$NAMESPACE_NAME"
+  kubectl label namespace "$NAMESPACE_NAME" name="$NAMESPACE_NAME"
+  echo "Created namespace $NAMESPACE_NAME."
+fi
 
 # Install CJE
 kubectl config set-context $(kubectl config current-context) --namespace="${NAMESPACE_NAME}"
