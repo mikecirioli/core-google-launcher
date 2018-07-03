@@ -3,18 +3,20 @@
 # Use commandline arguments first. If not found use env vars.
 
 INGRESS_IP=127.0.0.1 # default...
-if test "$#" -eq 2; then
+if test "$#" -eq 3; then
     NAMESPACE_NAME=$1
     CLUSTER_NAME=$2
-    echo "Using commandline arguments namespace=$NAMESPACE_NAME cluster=$CLUSTER_NAME"
+    CLUSTER_ZONE_NAME=$3
+    echo "Using commandline arguments namespace=$NAMESPACE_NAME cluster=$CLUSTER_NAME cluster_zone=$CLUSTER_ZONE"
   else
     NAMESPACE_NAME=$NAMESPACE
     CLUSTER_NAME=$CLUSTER
+    CLUSTER_ZONE_NAME=$CLUSTER_ZONE
     echo "Using environment var namespace=$NAMESPACE_NAME cluster=$CLUSTER_NAME"
 fi
 
 # Get cluster password and set auth for convenience
-PASSWORD=$(gcloud container clusters describe $CLUSTER_NAME | awk '/password/ {print $2}')
+PASSWORD=$(gcloud container clusters describe $CLUSTER_NAME --zone $CLUSTER_ZONE_NAME | awk '/password/ {print $2}')
 KUBECTL="kubectl -n $NAMESPACE_NAME --username=admin --password=$PASSWORD"
 
 # Convenience method to set CloudBees Jenkins Enterprise Operations Center domain
