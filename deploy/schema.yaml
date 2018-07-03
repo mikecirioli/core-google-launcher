@@ -11,7 +11,12 @@ properties:
     type: string
     x-google-marketplace:
       type: CLUSTER
+  cluster-zone:
+    type: string
+    default: us-east1-b
+    description: The zone the cluster is. Why do we need this?
 required:
 - name
 - namespace
 - cluster
+- cluster-zone

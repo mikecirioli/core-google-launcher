@@ -1,4 +1,16 @@
-# Use commandline arguments first. If not found use env vars.
+#!/bin/bash -eux
+#
+# Deploys CloudBees Jenkins Enterprise onto Google GKE.
+# You can pass in commandline arguments or use environment variables. Commandline arguments take precedent.
+# Commandline args:""
+#   $1 namespace name
+#   $2 cluster name
+#   $3 cluster zone
+# Environment variables:
+#   NAMESPACE
+#   CLUSTER
+#   CLUSTER_ZONE
+#
 
 INGRESS_IP=127.0.0.1 # default...
 if test "$#" -eq 3; then
@@ -26,7 +38,6 @@ install_cje() {
     
     # Set domain
     sed -i -e "s#cje.example.com#$(get_domain_name)#" "$install_file"
-    echo "Installing CJE"
     kubectl apply -f "$install_file"
 
     echo "Waiting for CJE to start"
@@ -109,14 +120,33 @@ fi
 
 # Install CJE
 kubectl config set-context $(kubectl config current-context) --namespace="${NAMESPACE_NAME}"
-install_cje "/data/cje.yml"
-
-# console validation
-if (curl -s "http://$(get_domain_name)/cjoc/login" | grep "Unlock Jenkins") 
-        echo "CloudBees Jenkins Enterprise launched successfully."
-        exit 0
+if [ -f $"/data/cje.yml" ]; then
+   echo "Installing CJE from /data/cje.yml."
+   install_cje "/data/cje.yml"
 else
-        echo "CloudBees Jenkins Enterprise failed to launch"
-        exit 1
+   echo "Installing CJE from ./cje.yml."
+   install_cje "./cje.yml"
+fi
+
+echo "CloudBees Jenkins Enterprise is installed and running at http://$(get_domain_name)/cjoc."
+
+# Test #1 console validation
+if curl -s "http://$(get_domain_name)/cjoc/login" | grep "Unlock Jenkins"; then
+  echo "CloudBees Jenkins Enterprise launched successfully."
+  exit 0
+else
+  echo "CloudBees Jenkins Enterprise failed to launch. CJOC not available."
+  exit 1
+fi
+
+# Test #2 check initial password
+initialAdminPassword=$(kubectl exec cjoc-0 -- cat /var/jenkins_home/secrets/initialAdminPassword)
+if [ -z "$initialAdminPassword"]; then
+  echo "CloudBees Jenkins Enterprise failed to launch"
+    exit 1
+else
+  echo "CloudBees Jenkins Enterprise launched successfully."
+  exit 0
+fi
 
 # End of script
