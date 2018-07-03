@@ -9,14 +9,14 @@ if test "$#" -eq 3; then
     CLUSTER_ZONE_NAME=$3
     echo "Using commandline arguments namespace=$NAMESPACE_NAME cluster=$CLUSTER_NAME cluster_zone=$CLUSTER_ZONE"
   else
-    NAMESPACE_NAME=$NAMESPACE
-    CLUSTER_NAME=$CLUSTER
-    CLUSTER_ZONE_NAME=$CLUSTER_ZONE
-    echo "Using environment var namespace=$NAMESPACE_NAME cluster=$CLUSTER_NAME"
+    NAMESPACE_NAME="$NAMESPACE"
+    CLUSTER_NAME="$CLUSTER"
+    CLUSTER_ZONE_NAME="$CLUSTER_ZONE"
+    echo "Using environment var namespace=$NAMESPACE_NAME cluster=$CLUSTER_NAME cluster_zone=$CLUSTER_ZONE"
 fi
 
 # Get cluster password and set auth for convenience
-PASSWORD=$(gcloud container clusters describe $CLUSTER_NAME --zone $CLUSTER_ZONE_NAME | awk '/password/ {print $2}')
+PASSWORD=$(gcloud container clusters describe "$CLUSTER_NAME" --zone "$CLUSTER_ZONE_NAME" | awk '/password/ {print $2}')
 KUBECTL="kubectl -n $NAMESPACE_NAME --username=admin --password=$PASSWORD"
 
 # Convenience method to set CloudBees Jenkins Enterprise Operations Center domain
@@ -91,7 +91,7 @@ retry_command() {
 # Main starts here
 
 # Configure GKE cluster to be ready for CJE
-gcloud container clusters get-credentials "$CLUSTER_NAME"
+gcloud container clusters get-credentials "$CLUSTER_NAME" --zone "$CLUSTER_ZONE_NAME"
 CLUSTERROLES=$(kubectl get clusterrolebinding)
 if echo "$CLUSTERROLES" | grep "cluster-admin-binding"; then
   echo "cluster-admin-binding role exists."
