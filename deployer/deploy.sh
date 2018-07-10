@@ -4,24 +4,16 @@
 # You can pass in commandline arguments or use environment variables. Commandline arguments take precedent.
 # Commandline args:""
 #   $1 namespace name
-#   $2 cluster name NOT NEEDED BECAUSE OF SERVICEACCOUNT
-#   $3 cluster zone NOT NEEDED BECAUSE OF SERVICEACCOUNT
 # Environment variables:
 #   NAMESPACE
-#   CLUSTER NOT NEEDED BECAUSE OF SERVICEACCOUNT
-#   CLUSTER_ZONE NOT NEEDED BECAUSE OF SERVICEACCOUNT
 #
 
 INGRESS_IP=127.0.0.1 # default...
-if test "$#" -eq 3; then
+if test "$#" -eq 1; then
     NAMESPACE_NAME=$1
-#    CLUSTER_NAME=$2 NOT NEEDED BECAUSE OF SERVICEACCOUNT
-#    CLUSTER_ZONE_NAME=$3 NOT NEEDED BECAUSE OF SERVICEACCOUNT
     echo "Using commandline arguments namespace=$NAMESPACE_NAME"
   else
     NAMESPACE_NAME="$NAMESPACE"
-#    CLUSTER_NAME="$CLUSTER"
-#    CLUSTER_ZONE_NAME="$CLUSTER_ZONE"
     echo "Using environment var namespace=$NAMESPACE_NAME"
 fi
 

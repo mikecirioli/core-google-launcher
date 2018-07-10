@@ -1,12 +1,11 @@
 # Overview
--
 
 Repository with scripts to configure and launch CloudBees Core on GKE.
 
 # Getting Started
--
 
 ## Set Your GCP Config and Authenticate
+
 ```shell
 gcloud config set project <GCP Project>
 gcloud config set compute/zone <zone>
@@ -15,6 +14,7 @@ gcloud auth login
 ```
 
 ## Create Your Cluster
+
 See [Getting Started](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/README.md#getting-started) to create your cluster. CloudBees Jenkins Enterprise requires a minimum 3 node cluster with each node having a minimum of 2 vCPU and k8s version 1.8.
 
 Then:
