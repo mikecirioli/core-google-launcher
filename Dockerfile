@@ -19,9 +19,9 @@ RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
 RUN apt-get -y install git
 RUN git clone https://github.com/cloudbees/core-google-launcher.git
 
-COPY deploy/deploy.sh /bin/
-COPY deploy/deploy_with_tests.sh /bin/
-COPY deploy/schema.yaml /data/
-COPY deploy/cje.yml /data/
+COPY deployer/deploy.sh /bin/
+COPY deployer/deploy_with_tests.sh /bin/
+COPY deployer/schema.yaml /data/
+COPY deployer/cje.yml /data/
 
 ENTRYPOINT ["/bin/bash", "/bin/deploy.sh"]

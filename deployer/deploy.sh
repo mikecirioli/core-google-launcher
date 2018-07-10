@@ -4,25 +4,25 @@
 # You can pass in commandline arguments or use environment variables. Commandline arguments take precedent.
 # Commandline args:""
 #   $1 namespace name
-#   $2 cluster name
-#   $3 cluster zone
+#   $2 cluster name NOT NEEDED BECAUSE OF SERVICEACCOUNT
+#   $3 cluster zone NOT NEEDED BECAUSE OF SERVICEACCOUNT
 # Environment variables:
 #   NAMESPACE
-#   CLUSTER
-#   CLUSTER_ZONE
+#   CLUSTER NOT NEEDED BECAUSE OF SERVICEACCOUNT
+#   CLUSTER_ZONE NOT NEEDED BECAUSE OF SERVICEACCOUNT
 #
 
 INGRESS_IP=127.0.0.1 # default...
 if test "$#" -eq 3; then
     NAMESPACE_NAME=$1
-    CLUSTER_NAME=$2
-    CLUSTER_ZONE_NAME=$3
-    echo "Using commandline arguments namespace=$NAMESPACE_NAME cluster=$CLUSTER_NAME cluster_zone=$CLUSTER_ZONE"
+#    CLUSTER_NAME=$2 NOT NEEDED BECAUSE OF SERVICEACCOUNT
+#    CLUSTER_ZONE_NAME=$3 NOT NEEDED BECAUSE OF SERVICEACCOUNT
+    echo "Using commandline arguments namespace=$NAMESPACE_NAME"
   else
     NAMESPACE_NAME="$NAMESPACE"
-    CLUSTER_NAME="$CLUSTER"
-    CLUSTER_ZONE_NAME="$CLUSTER_ZONE"
-    echo "Using environment var namespace=$NAMESPACE_NAME cluster=$CLUSTER_NAME cluster_zone=$CLUSTER_ZONE"
+#    CLUSTER_NAME="$CLUSTER"
+#    CLUSTER_ZONE_NAME="$CLUSTER_ZONE"
+    echo "Using environment var namespace=$NAMESPACE_NAME"
 fi
 
 # Convenience method to set CloudBees Jenkins Enterprise Operations Center domain
@@ -95,28 +95,28 @@ retry_command() {
 
 # Main starts here
 
-# Configure GKE cluster to be ready for CJE
-gcloud container clusters get-credentials "$CLUSTER_NAME" --zone "$CLUSTER_ZONE_NAME"
-CLUSTERROLES=$(kubectl get clusterrolebinding)
-if echo "$CLUSTERROLES" | grep "cluster-admin-binding"; then
-  echo "cluster-admin-binding role exists."
-else
-  kubectl create clusterrolebinding cluster-admin-binding  --clusterrole cluster-admin  --user $(gcloud config get-value account)
-  echo "Created role cluster-admin-binding."
-fi
+# NOT NEEDED BECAUSE OF SERVICEACCOUNT. Configure GKE cluster to be ready for CJE
+# gcloud container clusters get-credentials "$CLUSTER_NAME" --zone "$CLUSTER_ZONE_NAME"
+# CLUSTERROLES=$(kubectl get clusterrolebinding)
+# if echo "$CLUSTERROLES" | grep "cluster-admin-binding"; then
+#   echo "cluster-admin-binding role exists."
+# else
+#   kubectl create clusterrolebinding cluster-admin-binding  --clusterrole cluster-admin  --user $(gcloud config get-value account)
+#   echo "Created role cluster-admin-binding."
+# fi
 
 # Install ingress controller and get IP
 install_ingress_controller
 
-# Create namespace 
-NAMESPACES=$(kubectl get namespaces)
-if echo "$NAMESPACES" | grep "$NAMESPACE_NAME"; then
-  echo "$NAMESPACE_NAME namespace exists."
-else
-  kubectl create namespace "$NAMESPACE_NAME"
-  kubectl label namespace "$NAMESPACE_NAME" name="$NAMESPACE_NAME"
-  echo "Created namespace $NAMESPACE_NAME."
-fi
+# Create namespace NOT NEEDED NAMESPACE IS CREATED FOR US
+# NAMESPACES=$(kubectl get namespaces)
+# if echo "$NAMESPACES" | grep "$NAMESPACE_NAME"; then
+#  echo "$NAMESPACE_NAME namespace exists."
+# else
+#  kubectl create namespace "$NAMESPACE_NAME"
+#  kubectl label namespace "$NAMESPACE_NAME" name="$NAMESPACE_NAME"
+#  echo "Created namespace $NAMESPACE_NAME."
+# fi
 
 # Install CJE
 kubectl config set-context $(kubectl config current-context) --namespace="${NAMESPACE_NAME}"
