@@ -6,15 +6,18 @@
 #   $1 namespace name
 # Environment variables:
 #   NAMESPACE
+#   SERVICEACCOUNT
 #
 
 INGRESS_IP=127.0.0.1 # default...
-if test "$#" -eq 1; then
+if test "$#" -eq 2; then
     NAMESPACE_NAME=$1
-    echo "Using commandline arguments namespace=$NAMESPACE_NAME"
+    SERVICEACCOUNT_NAME=$2
+    echo "Using commandline arguments namespace=$NAMESPACE_NAME and serviceaccount=$SERVICEACCOUNT_NAME"
   else
-    NAMESPACE_NAME="$NAMESPACE"
-    echo "Using environment var namespace=$NAMESPACE_NAME"
+    NAMESPACE_NAME="$namespace"
+    SERVICEACCOUNT_NAME="$operatorServiceAccount"
+    echo "Using environment var namespace=$NAMESPACE_NAME and serviceaccount=$SERVICEACCOUNT_NAME"
 fi
 
 # Convenience method to set CloudBees Jenkins Enterprise Operations Center domain
@@ -87,15 +90,15 @@ retry_command() {
 
 # Main starts here
 
-# NOT NEEDED BECAUSE OF SERVICEACCOUNT. Configure GKE cluster to be ready for CJE
+# Configure GKE cluster to be ready for CJE
 # gcloud container clusters get-credentials "$CLUSTER_NAME" --zone "$CLUSTER_ZONE_NAME"
-# CLUSTERROLES=$(kubectl get clusterrolebinding)
-# if echo "$CLUSTERROLES" | grep "cluster-admin-binding"; then
-#   echo "cluster-admin-binding role exists."
-# else
-#   kubectl create clusterrolebinding cluster-admin-binding  --clusterrole cluster-admin  --user $(gcloud config get-value account)
-#   echo "Created role cluster-admin-binding."
-# fi
+ CLUSTERROLES=$(kubectl get clusterrolebinding)
+ if echo "$CLUSTERROLES" | grep "cluster-admin-binding"; then
+   echo "cluster-admin-binding role exists."
+ else
+   kubectl create clusterrolebinding cluster-admin-binding  --clusterrole "${SERVICEACCOUNT_NAME}"  --user $(gcloud config get-value account)
+   echo "Created role cluster-admin-binding."
+ fi
 
 # Install ingress controller and get IP
 install_ingress_controller

@@ -16,7 +16,14 @@ properties:
         - type: ClusterRole  
           rulesType: PREDEFINED
           rulesFromRoleName: cluster-admin  
+  ssdStorageClass:
+    type: string
+    x-google-marketplace:
+      type: STORAGE_CLASS
+      storageClass:
+        type: SSD
 required:
 - name
 - namespace
 - operatorServiceAccount
+- ssdStorageClass
