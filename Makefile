@@ -18,7 +18,7 @@ include ./vendor/marketplace-tools/gcloud.Makefile
 # It requires several APP_* variables defined as followed.
 include ./vendor/marketplace-tools/app.Makefile
 
-APP_DEPLOYER_IMAGE ?= $(REGISTRY)/deployer:$(TAG)
+APP_DEPLOYER_IMAGE ?= $(REGISTRY)/cloudbees/deployer:$(TAG)
 NAME ?= cloudbees-jenkins-enterprise-1
 APP_PARAMETERS ?= { \
   "name": "$(NAME)", \
