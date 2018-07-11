@@ -1,1 +1,1 @@
-gcr.io/cje-marketplace-dev/deployer:latest
+gcr.io/cje-marketplace-dev/cloudbees/deployer:latest

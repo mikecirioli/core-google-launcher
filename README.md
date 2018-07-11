@@ -28,7 +28,6 @@ gcloud container clusters get-credentials <cluster>
 ### Create your Namespace
 ```shell
 kubectl create <namespace>
-export NAMESPACE=<namespace>
 ```
 
 ### One-time CRD Setup

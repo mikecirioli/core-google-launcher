@@ -92,7 +92,7 @@ retry_command() {
 # fi
 
 # Install ingress controller and get IP
-install_ingress_controller
+#install_ingress_controller
 
 # Create namespace NOT NEEDED NAMESPACE IS CREATED FOR US
 # NAMESPACES=$(kubectl get namespaces)
