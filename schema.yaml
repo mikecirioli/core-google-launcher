@@ -13,57 +13,20 @@ properties:
       type: SERVICE_ACCOUNT
       serviceAccount:
         roles:
-        - type: Role  
-          rulesType: CUSTOM
-          rules:
-          - apiGroups: ['']
-            resources: ['pods']
-            verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['']
-            resources: ['pods/exec']
-            verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['']
-            resources: ['pods/log']
-            verbs: ['get','list','watch']
-          - apiGroups: ['apps']
-            resources: ['statefulsets']
-            verbs: ['create','delete','get','list','patch','update','watch']
-          # - apiGroups: ['']
-          #   resources: ['namespaces']
-          #   verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['']
-            resources: ['services']
-            verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['']
-            resources: ['persistentvolumeclaims']
-            verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['extensions']
-            resources: ['ingresses']
-            verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['']
-            resources: ['secrets']
-            verbs: ['list']
-          - apiGroups: ['']
-            resources: ['events']
-            verbs: ['get','list','watch']
+        - type: ClusterRole
+          rulesType: PREDEFINED
+          # TODO(liyinan926): Reduce the permission set.
+          rulesFromRoleName: cluster-admin
   jenkins:
     type: string
     x-google-marketplace:
       type: SERVICE_ACCOUNT
       serviceAccount:
         roles:
-        - type: Role  
-          rulesType: CUSTOM
-          rules:
-          - apiGroups: ['']
-            resources: ['pods']
-            verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['']
-            resources: ['pods/exec']
-            verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['']
-            resources: ['pods/log']
-            verbs: ['get','list','watch']
+        - type: ClusterRole
+          rulesType: PREDEFINED
+          # TODO(liyinan926): Reduce the permission set.
+          rulesFromRoleName: cluster-admin
   ssd:
     type: string
     x-google-marketplace:
