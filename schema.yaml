@@ -16,34 +16,34 @@ properties:
         - type: Role  
           rulesType: CUSTOM
           rules:
-          - apiGroups: ['app.k8s.io/v1beta1']
+          - apiGroups: ['']
             resources: ['pods']
             verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['app.k8s.io/v1beta1']
+          - apiGroups: ['']
             resources: ['pods/exec']
             verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['app.k8s.io/v1beta1']
+          - apiGroups: ['']
             resources: ['pods/log']
             verbs: ['get','list','watch']
           - apiGroups: ['apps']
             resources: ['statefulsets']
             verbs: ['create','delete','get','list','patch','update','watch']
-          # - apiGroups: ['app.k8s.io/v1beta1']
+          # - apiGroups: ['']
           #   resources: ['namespaces']
           #   verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['app.k8s.io/v1beta1']
+          - apiGroups: ['']
             resources: ['services']
             verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['app.k8s.io/v1beta1']
+          - apiGroups: ['']
             resources: ['persistentvolumeclaims']
             verbs: ['create','delete','get','list','patch','update','watch']
           - apiGroups: ['extensions']
             resources: ['ingresses']
             verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['app.k8s.io/v1beta1']
+          - apiGroups: ['']
             resources: ['secrets']
             verbs: ['list']
-          - apiGroups: ['app.k8s.io/v1beta1']
+          - apiGroups: ['']
             resources: ['events']
             verbs: ['get','list','watch']
   jenkins:
@@ -55,83 +55,15 @@ properties:
         - type: Role  
           rulesType: CUSTOM
           rules:
-          - apiGroups: ['app.k8s.io/v1beta1']
+          - apiGroups: ['']
             resources: ['pods']
             verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['app.k8s.io/v1beta1']
+          - apiGroups: ['']
             resources: ['pods/exec']
             verbs: ['create','delete','get','list','patch','update','watch']
-          - apiGroups: ['app.k8s.io/v1beta1']
+          - apiGroups: ['']
             resources: ['pods/log']
             verbs: ['get','list','watch']
-  nginxIngressServiceAccount:
-    type: string
-    x-google-marketplace:
-      type: SERVICE_ACCOUNT
-      serviceAccount:
-        roles:
-        - type: ClusterRole  
-          rulesType: CUSTOM
-          rules:
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['configmaps']
-              verbs: ['list','watch']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['endpoints']
-              verbs: ['list','watch']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['nodes',]
-              verbs: ['list','watch']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['pods']
-              verbs: ['list','watch']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['secrets']
-              verbs: ['list','watch']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['nodes']
-              verbs: ['get']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['services']
-              verbs: ['get', 'list','watch']
-            - apiGroups: ['extensions']
-              resources: ['ingresses']
-              verbs: ['get', 'list', 'watch']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['events']
-              verbs: ['create', 'patch']
-            - apiGroups: ['extensions']
-              resources: ['ingresses/status']
-              verbs: ['update']
-        - type: Role  
-          rulesType: CUSTOM
-          rules:
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['configmaps']
-              verbs: ['get']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['pods']
-              verbs: ['get']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['secrets']
-              verbs: ['get']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['namespaces']
-              verbs: ['get']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['configmaps']
-              resourceNames: ['ingress-controller-leader-nginx']
-                # Defaults to '<election-id>-<ingress-class>'
-                # Here: '<ingress-controller-leader>-<nginx>'
-                # This has to be adapted if you change either parameter
-                # when launching the nginx-ingress-controller.
-              verbs: ['get', 'update']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['configmaps']
-              verbs: ['create']
-            - apiGroups: ['app.k8s.io/v1beta1']
-              resources: ['endpoints']
-              verbs: ['get']
   ssd:
     type: string
     x-google-marketplace:
@@ -143,5 +75,4 @@ required:
 - namespace
 - cjoc
 - jenkins
-- nginxIngressServiceAccount
 - ssd
