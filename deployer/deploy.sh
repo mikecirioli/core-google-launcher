@@ -1,120 +1,77 @@
-#!/bin/bash -eux
+#!/bin/bash
 #
-# Deploys CloudBees Jenkins Enterprise onto Google GKE.
-# You can pass in commandline arguments or use environment variables. Commandline arguments take precedent.
-# Commandline args:""
-#   $1 namespace name
-# Environment variables:
-#   NAMESPACE
-#   SERVICEACCOUNT
+# Copyright 2018 Google LLC
 #
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-INGRESS_IP=127.0.0.1 # default...
+set -eox pipefail
 
-# Convenience method to set CloudBees Jenkins Enterprise Operations Center domain
-get_domain_name() {
-  echo "cje.$INGRESS_IP.xip.io"
-}
+# This is the entry point for the production deployment
 
-# Installs CloudBees Jenkins Enterprise
-install_cje() {
-    local source=${1:?}
-    local install_file; install_file=$(mktemp)
-    cp $source $install_file
-    
-    # Set domain
-    sed -i -e "s#cje.example.com#$(get_domain_name)#" "$install_file"
-    kubectl apply -f "$install_file"
-
-    echo "Waiting for CJE to start"
-    TIMEOUT=10 retry_command curl -sSLf -o /dev/null http://$(get_domain_name)/cjoc/login
-}
-
-# installs ingress controller if it doesn't already exist
-install_ingress_controller(){
-if [[ -z $(kubectl get namespace | grep ingress-nginx ) ]]; then
-  curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml | kubectl apply -f -
-  curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/provider/cloud-generic.yaml | kubectl apply -f -
-  echo "Installed ingress controller."
-else
-  echo "Ingress controller already exists."
-fi
-
-  # Set and check the ingress ip
-  while [[ "$(kubectl get svc ingress-nginx -n ingress-nginx  -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" = '' ]]; do sleep 3; done
-  INGRESS_IP=$(kubectl get svc ingress-nginx -n ingress-nginx  -o jsonpath='{.status.loadBalancer.ingress[0].ip}' | sed 's/"//g')
-  echo "NGINX INGRESS: $INGRESS_IP"
-}
-
-# Convenience method to retry a command several times
-retry_command() {
-  local max_attempts=${ATTEMPTS-60}
-  local timeout=${TIMEOUT-1}
-  local attempt=0
-  local exitCode=0
-
-  while (( $attempt < $max_attempts ))
-  do
-    set +e
-    "$@"
-    exitCode=$?
-    set -e
-
-    if [[ $exitCode == 0 ]]
-    then
-      break
-    fi
-
-    echo "$(date -u '+%T') Failure ($exitCode) Retrying in $timeout seconds..." 1>&2
-    sleep $timeout
-    attempt=$(( attempt + 1 ))
-    timeout=$(( timeout ))
-  done
-
-  if [[ $exitCode != 0 ]]
-  then
-    echo "$(date -u '+%T') Failed in the last attempt ($@)" 1>&2
+# If any command returns with non-zero exit code, set -e will cause the script
+# to exit. Prior to exit, set App assembly status to "Failed".
+handle_failure() {
+  code=$?
+  if [[ -z "$NAME" ]] || [[ -z "$NAMESPACE" ]]; then
+    # /bin/expand_config.py might have failed.
+    # We fall back to the unexpanded params to get the name and namespace.
+    NAME="$(/bin/print_config.py --param '{"x-google-marketplace": {"type": "NAME"}}' \
+            --values_file /data/values.yaml --values_dir /data/values)"
+    NAMESPACE="$(/bin/print_config.py --param '{"x-google-marketplace": {"type": "NAMESPACE"}}' \
+                 --values_file /data/values.yaml --values_dir /data/values)"
+    export NAME
+    export NAMESPACE
   fi
-
-  return $exitCode
+  patch_assembly_phase.sh --status="Failed"
+  exit $code
 }
+trap "handle_failure" EXIT
 
-# Main starts here
+/bin/expand_config.py
+NAME="$(/bin/print_config.py --param '{"x-google-marketplace": {"type": "NAME"}}')"
+NAMESPACE="$(/bin/print_config.py --param '{"x-google-marketplace": {"type": "NAMESPACE"}}')"
+export NAME
+export NAMESPACE
 
-# Configure GKE cluster to be ready for CJE
-# gcloud container clusters get-credentials "$CLUSTER_NAME" --zone "$CLUSTER_ZONE_NAME"
-# CLUSTERROLES=$(kubectl get clusterrolebinding)
-# if echo "$CLUSTERROLES" | grep "cluster-admin-binding"; then
-#   echo "cluster-admin-binding role exists."
-# else
-#   kubectl create clusterrolebinding cluster-admin-binding  --clusterrole "${SERVICEACCOUNT_NAME}"  --user $(gcloud config get-value account)
-#   echo "Created role cluster-admin-binding."
-# fi
+echo "Deploying application \"$NAME\""
 
-# Install ingress controller and get IP
-#install_ingress_controller
+app_uid=$(kubectl get "applications/$NAME" \
+  --namespace="$NAMESPACE" \
+  --output=jsonpath='{.metadata.uid}')
+app_api_version=$(kubectl get "applications/$NAME" \
+  --namespace="$NAMESPACE" \
+  --output=jsonpath='{.apiVersion}')
 
-# Create namespace NOT NEEDED NAMESPACE IS CREATED FOR US
-# NAMESPACES=$(kubectl get namespaces)
-# if echo "$NAMESPACES" | grep "$NAMESPACE_NAME"; then
-#  echo "$NAMESPACE_NAME namespace exists."
-# else
-#  kubectl create namespace "$NAMESPACE_NAME"
-#  kubectl label namespace "$NAMESPACE_NAME" name="$NAMESPACE_NAME"
-#  echo "Created namespace $NAMESPACE_NAME."
-# fi
+create_manifests.sh
 
-# Install CJE
-#kubectl config set-context $(kubectl config current-context) --namespace="${NAMESPACE_NAME}"
-if [ -f $"/data/cje.yml" ]; then
-   echo "Installing CJE from /data/cje.yml."
-   install_cje "/data/cje.yml"
-else
-   echo "Installing CJE from ./cje.yml."
-   install_cje "./cje.yml"
-fi
+# Assign owner references for the resources.
+/bin/set_ownership.py \
+  --app_name "$NAME" \
+  --app_uid "$app_uid" \
+  --app_api_version "$app_api_version" \
+  --manifests "/data/manifest-expanded" \
+  --dest "/data/resources.yaml"
 
-echo "CloudBees Jenkins Enterprise is installed and running at http://$(get_domain_name)/cjoc."
+# Ensure assembly phase is "Pending", until successful kubectl apply.
+/bin/setassemblyphase.py \
+  --manifest "/data/resources.yaml" \
+  --status "Pending"
 
-exit 0
-# End of script
+# Apply the manifest.
+kubectl apply --namespace="$NAMESPACE" --filename="/data/resources.yaml"
+
+patch_assembly_phase.sh --status="Success"
+
+clean_iam_resources.sh
+
+trap - EXIT

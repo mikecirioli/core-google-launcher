@@ -1,61 +1,4 @@
 # CJE kubernetes
-
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: cjoc
-
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: master-management
-rules:
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["create","delete","get","list","patch","update","watch"]
-- apiGroups: [""]
-  resources: ["pods/exec"]
-  verbs: ["create","delete","get","list","patch","update","watch"]
-- apiGroups: [""]
-  resources: ["pods/log"]
-  verbs: ["get","list","watch"]
-- apiGroups: ["apps"]
-  resources: ["statefulsets"]
-  verbs: ["create","delete","get","list","patch","update","watch"]
-# - apiGroups: [""]
-#   resources: ["namespaces"]
-#   verbs: ["create","delete","get","list","patch","update","watch"]
-- apiGroups: [""]
-  resources: ["services"]
-  verbs: ["create","delete","get","list","patch","update","watch"]
-- apiGroups: [""]
-  resources: ["persistentvolumeclaims"]
-  verbs: ["create","delete","get","list","patch","update","watch"]
-- apiGroups: ["extensions"]
-  resources: ["ingresses"]
-  verbs: ["create","delete","get","list","patch","update","watch"]
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["list"]
-- apiGroups: [""]
-  resources: ["events"]
-  verbs: ["get","list","watch"]
-
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: RoleBinding
-metadata:
-  name: cjoc
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: master-management
-  # namespace: myproject
-subjects:
-- kind: ServiceAccount
-  name: cjoc
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -86,14 +29,6 @@ data:
     jenkins.model.JenkinsLocationConfiguration.get().setUrl("https://cje.example.com/cjoc");
 
 ---
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: ssd
-provisioner: kubernetes.io/gce-pd
-parameters:
-  type: pd-ssd
----
 apiVersion: "apps/v1beta1"
 kind: "StatefulSet"
 metadata:
@@ -113,7 +48,7 @@ spec:
         com.cloudbees.cje.type: cjoc
         com.cloudbees.cje.tenant: cjoc
     spec:
-      serviceAccountName: cjoc
+      serviceAccountName: $cjoc
       terminationGracePeriodSeconds: 10
       containers:
       - name: jenkins
@@ -137,7 +72,7 @@ spec:
             -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.fsGroup=1000
             -Dhudson.lifecycle=hudson.lifecycle.ExitLifecycle
             -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImage=gcr.io/cje-marketplace-dev/cloudbees/cje-mm:latest
-            -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.storageClassName=ssd
+            -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.storageClassName=$ssd
             -Dcom.cloudbees.jce.masterprovisioning.ContainerMasterProvisioningDescriptor.memory=3072
         - name: MEM_LIMIT
           valueFrom:
@@ -184,7 +119,7 @@ spec:
       resources:
         requests:
           storage: 20Gi
-      storageClassName: ssd
+      storageClassName: $ssd
 
 ---
 apiVersion: v1
@@ -232,42 +167,6 @@ spec:
     host: cje.example.com
 # Service account for masters
 # from https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/main/kubernetes/service-account.yml
-
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: jenkins
-
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: pods-all
-rules:
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["create","delete","get","list","patch","update","watch"]
-- apiGroups: [""]
-  resources: ["pods/exec"]
-  verbs: ["create","delete","get","list","patch","update","watch"]
-- apiGroups: [""]
-  resources: ["pods/log"]
-  verbs: ["get","list","watch"]
-
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: RoleBinding
-metadata:
-  name: jenkins
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: pods-all
-  # namespace: myproject
-subjects:
-- kind: ServiceAccount
-  name: jenkins
 ---
 apiVersion: v1
 kind: ConfigMap

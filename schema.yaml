@@ -1,0 +1,171 @@
+properties:
+  name:
+    type: string
+    x-google-marketplace:
+     type: NAME
+  namespace:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  cjoc:
+    type: string
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+        - type: Role  
+          rulesType: CUSTOM
+          rules:
+          - apiGroups: [""]
+            resources: ["pods"]
+            verbs: ["create","delete","get","list","patch","update","watch"]
+          - apiGroups: [""]
+            resources: ["pods/exec"]
+            verbs: ["create","delete","get","list","patch","update","watch"]
+          - apiGroups: [""]
+            resources: ["pods/log"]
+            verbs: ["get","list","watch"]
+          - apiGroups: ["apps"]
+            resources: ["statefulsets"]
+            verbs: ["create","delete","get","list","patch","update","watch"]
+          # - apiGroups: [""]
+          #   resources: ["namespaces"]
+          #   verbs: ["create","delete","get","list","patch","update","watch"]
+          - apiGroups: [""]
+            resources: ["services"]
+            verbs: ["create","delete","get","list","patch","update","watch"]
+          - apiGroups: [""]
+            resources: ["persistentvolumeclaims"]
+            verbs: ["create","delete","get","list","patch","update","watch"]
+          - apiGroups: ["extensions"]
+            resources: ["ingresses"]
+            verbs: ["create","delete","get","list","patch","update","watch"]
+          - apiGroups: [""]
+            resources: ["secrets"]
+            verbs: ["list"]
+          - apiGroups: [""]
+            resources: ["events"]
+            verbs: ["get","list","watch"]
+  jenkins:
+    type: string
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+        - type: Role  
+          rulesType: CUSTOM
+          rules:
+          - apiGroups: [""]
+            resources: ["pods"]
+            verbs: ["create","delete","get","list","patch","update","watch"]
+          - apiGroups: [""]
+            resources: ["pods/exec"]
+            verbs: ["create","delete","get","list","patch","update","watch"]
+          - apiGroups: [""]
+            resources: ["pods/log"]
+  verbs: ["get","list","watch"]
+  nginx-ingress-serviceaccount:
+    type: string
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+        - type: ClusterRole  
+          rulesType: CUSTOM
+          rules:
+            - apiGroups:
+              - ""
+            resources:
+              - configmaps
+              - endpoints
+              - nodes
+              - pods
+              - secrets
+            verbs:
+              - list
+              - watch
+          - apiGroups:
+              - ""
+            resources:
+              - nodes
+            verbs:
+              - get
+          - apiGroups:
+              - ""
+            resources:
+              - services
+            verbs:
+              - get
+              - list
+              - watch
+          - apiGroups:
+              - "extensions"
+            resources:
+              - ingresses
+            verbs:
+              - get
+              - list
+              - watch
+          - apiGroups:
+              - ""
+            resources:
+                - events
+            verbs:
+                - create
+                - patch
+          - apiGroups:
+              - "extensions"
+            resources:
+              - ingresses/status
+            verbs:
+              - update
+        - type: Role  
+          rulesType: CUSTOM
+          rules:
+            - apiGroups:
+              - ""
+            resources:
+              - configmaps
+              - pods
+              - secrets
+              - namespaces
+            verbs:
+              - get
+          - apiGroups:
+              - ""
+            resources:
+              - configmaps
+            resourceNames:
+              # Defaults to "<election-id>-<ingress-class>"
+              # Here: "<ingress-controller-leader>-<nginx>"
+              # This has to be adapted if you change either parameter
+              # when launching the nginx-ingress-controller.
+              - "ingress-controller-leader-nginx"
+            verbs:
+              - get
+              - update
+          - apiGroups:
+              - ""
+            resources:
+              - configmaps
+            verbs:
+              - create
+          - apiGroups:
+              - ""
+            resources:
+              - endpoints
+            verbs:
+              - get
+  ssd:
+    type: string
+    x-google-marketplace:
+      type: STORAGE_CLASS
+      storageClass:
+        type: SSD
+required:
+- name
+- namespace
+- cjoc
+- jenkins
+- nginx-ingress-serviceaccount
+- ssd
