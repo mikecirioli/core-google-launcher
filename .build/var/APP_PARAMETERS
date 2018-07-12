@@ -1,1 +1,1 @@
-{ name: cloudbees-jenkins-enterprise-1, namespace: launcher-test }
+{ name: cloudbees-jenkins-enterprise-1, namespace: deployer-test }

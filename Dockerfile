@@ -21,7 +21,7 @@ RUN git clone https://github.com/cloudbees/core-google-launcher.git
 
 COPY deployer/deploy.sh /bin/
 COPY deployer/deploy_with_tests.sh /bin/
-COPY deployer/schema.yaml /data/
-COPY deployer/cje.yml /data/
+COPY schema.yaml /data/
+COPY manifest /data/manifest
 
 ENTRYPOINT ["/bin/bash", "/bin/deploy.sh"]
