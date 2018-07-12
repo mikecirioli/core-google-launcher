@@ -63,7 +63,7 @@ properties:
             verbs: ["create","delete","get","list","patch","update","watch"]
           - apiGroups: [""]
             resources: ["pods/log"]
-  verbs: ["get","list","watch"]
+            verbs: ["get","list","watch"]
   nginxIngressServiceAccount:
     type: string
     x-google-marketplace:
@@ -74,7 +74,19 @@ properties:
           rulesType: CUSTOM
           rules:
             - apiGroups: [""]
-              resources: ["configmaps","endpoints","nodes","pods","secrets"]
+              resources: ["configmaps"]
+              verbs: ["list","watch"]
+            - apiGroups: [""]
+              resources: ["endpoints"]
+              verbs: ["list","watch"]
+            - apiGroups: [""]
+              resources: ["nodes",]
+              verbs: ["list","watch"]
+            - apiGroups: [""]
+              resources: ["pods"]
+              verbs: ["list","watch"]
+            - apiGroups: [""]
+              resources: ["secrets"]
               verbs: ["list","watch"]
             - apiGroups: [""]
               resources: ["nodes"]
@@ -95,7 +107,16 @@ properties:
           rulesType: CUSTOM
           rules:
             - apiGroups: [""]
-              resources: ["configmaps", "pods","secrets","namespaces"]
+              resources: ["configmaps"]
+              verbs: ["get"]
+            - apiGroups: [""]
+              resources: ["pods"]
+              verbs: ["get"]
+            - apiGroups: [""]
+              resources: ["secrets"]
+              verbs: ["get"]
+            - apiGroups: [""]
+              resources: ["namespaces"]
               verbs: ["get"]
             - apiGroups: [""]
               resources: ["configmaps"]
