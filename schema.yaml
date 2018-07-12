@@ -64,7 +64,7 @@ properties:
           - apiGroups: [""]
             resources: ["pods/log"]
   verbs: ["get","list","watch"]
-  nginx-ingress-serviceaccount:
+  nginxIngressServiceAccount:
     type: string
     x-google-marketplace:
       type: SERVICE_ACCOUNT
