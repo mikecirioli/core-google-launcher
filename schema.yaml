@@ -143,5 +143,5 @@ required:
 - namespace
 - cjoc
 - jenkins
-- nginx-ingress-serviceaccount
+- nginxIngressServiceAccount
 - ssd
