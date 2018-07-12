@@ -67,6 +67,9 @@ create_manifests.sh
   --manifest "/data/resources.yaml" \
   --status "Pending"
 
+#set clusteradmin
+kubectl create clusterrolebinding cluster-admin-binding  --clusterrole clusteradmin  --user $(gcloud config get-value account)
+
 # Apply the manifest.
 kubectl apply --namespace="$NAMESPACE" --filename="/data/resources.yaml"
 

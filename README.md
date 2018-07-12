@@ -27,7 +27,7 @@ gcloud container clusters get-credentials <cluster>
 
 ### Create your Namespace
 ```shell
-kubectl create <namespace>
+kubectl create namespace <namespace>
 export NAMESPACE=<namespace>
 ```
 
