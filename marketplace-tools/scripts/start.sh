@@ -56,6 +56,7 @@ app_version="$( \
   | docker run -i --entrypoint=jq --rm "${deployer}" \
     -r 'if .application_api_version then .application_api_version else "v1alpha1" end')"
 
+echo "start.sh: name=${name} namespace=${namespace} app_version=${app_version}"
 # Create Application instance.
 kubectl apply --namespace="$namespace" --filename=- <<EOF
 apiVersion: "app.k8s.io/${app_version}"
