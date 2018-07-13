@@ -139,7 +139,7 @@ create_manifests.sh
   --manifest "/data/ingress-controller.yaml" \
   --status "Pending"
 
-#install_ingress_controller "/data/ingress-controller.yaml"
+install_ingress_controller "/data/ingress-controller.yaml"
 
 ###cje###
 # Assign owner references for the resources.
