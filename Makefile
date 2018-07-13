@@ -21,7 +21,7 @@ include ./marketplace-tools/var.Makefile
 include ./marketplace-tools/app.Makefile
 
 APP_DEPLOYER_IMAGE ?= $(REGISTRY)/cloudbees/deployer:$(TAG)
-NAME ?= cloudbees-jenkins-enterprise-1
+NAME ?= cloudbees-core-1
 APP_PARAMETERS ?= { \
   "name": "$(NAME)", \
   "namespace": "$(NAMESPACE)" \
@@ -29,7 +29,7 @@ APP_PARAMETERS ?= { \
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-#app/build:: .build/wordpress/deployer \
+#app/build:: .build/deployer \
 #            .build/wordpress/init \
 #            .build/wordpress/mysql \
 #            .build/wordpress/tester \
