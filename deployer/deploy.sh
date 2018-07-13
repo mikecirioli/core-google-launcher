@@ -19,7 +19,7 @@ INGRESS_IP=127.0.0.1
 set -eox pipefail
 
 get_domain_name() {
-  echo "$NAMESPACE.$INGRESS_IP.xip.io"
+  echo "$NAME.$INGRESS_IP.xip.io"
 }
 
 # Installs CloudBees Jenkins Enterprise
