@@ -1,5 +1,18 @@
 # CJE kubernetes
 ---
+apiVersion: marketplace.cloud.google.com/v1
+kind: Application
+metadata:
+  annotations:
+    marketplace.cloud.google.com: |
+      {"name":"CloudBees Core","version":"v2.121.1.2","description":"CloudBees Core extends Jenkins with functionality that embeds best practices, rapid onboarding, security and compliance. It provides a shared, centrally-managed CI/CD service but delivers a self-service experience for engineering teams.","url":"cloudbees.com","tagline":"cloudbees","support_info":"support.cloudbees.com","documentations":[{"url":"https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/getting-started/#","title":"Getting Started","description":"A quick walkthrough"}]}
+  ApplicationStatus:
+    ready: true
+  generation: 0
+  initializers: null
+  name: "$APP_INSTANCE_NAME"
+  namespace: "$NAMESPACE"
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
