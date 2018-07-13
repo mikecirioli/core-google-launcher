@@ -48,7 +48,7 @@ spec:
         com.cloudbees.cje.type: cjoc
         com.cloudbees.cje.tenant: cjoc
     spec:
-      serviceAccountName: $APP_INSTANCE_NAME-cjoc
+      serviceAccountName: $NAME-cjoc
       terminationGracePeriodSeconds: 10
       containers:
       - name: jenkins
@@ -72,7 +72,7 @@ spec:
             -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.fsGroup=1000
             -Dhudson.lifecycle=hudson.lifecycle.ExitLifecycle
             -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImage=gcr.io/cje-marketplace-dev/cloudbees/cje-mm:latest
-            -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.storageClassName=$NAMESPACE-$APP_INSTANCE_NAME-ssd
+            -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.storageClassName=$NAMESPACE-$NAME-ssd
             -Dcom.cloudbees.jce.masterprovisioning.ContainerMasterProvisioningDescriptor.memory=3072
         - name: MEM_LIMIT
           valueFrom:
@@ -119,7 +119,7 @@ spec:
       resources:
         requests:
           storage: 20Gi
-      storageClassName: $NAMESPACE-$APP_INSTANCE_NAME-ssd
+      storageClassName: $NAMESPACE-$NAME-ssd
 
 ---
 apiVersion: v1
