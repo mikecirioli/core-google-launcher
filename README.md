@@ -15,7 +15,7 @@ gcloud auth login
 
 ## Create Your Cluster
 
-See [Getting Started](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/README.md#getting-started) to create your cluster. CloudBees Jenkins Enterprise requires a minimum 3 node cluster with each node having a minimum of 2 vCPU and k8s version 1.8.
+See [Getting Started](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/README.md#getting-started) to create your cluster. CloudBees Core requires a minimum 3 node cluster with each node having a minimum of 2 vCPU and k8s version 1.8.
 
 Then:
 
@@ -23,7 +23,7 @@ Then:
 gcloud container clusters get-credentials <cluster> 
 ```
 
-## Installing CloudBees Jenkins Enterprise on Your Cluster
+## Installing CloudBees Core on Your Cluster
 
 ### Create your Namespace
 ```shell
@@ -37,7 +37,7 @@ export NAMESPACE=<namespace>
 make crd/install
 ```
 
-### Install CloudBees Jenkins Enterprise on your Cluster
+### Install CloudBees Core on your Cluster
 
 ```shell
 make app/install
@@ -48,10 +48,32 @@ make app/install
 ```shell
 make app/watch
 ```
-### Delete the Installation
+
+### Go to the CloudBees Jenkins Operation Center
+
+```shell
+make app/watch
+```
+
+### Get Your Initial Admin Password
+
+### Setup Wizard
+
+### Delete the Installation (optional)
 
 ```shell
 make app/uninstall
 ```
+## Using CloudBees Core
 
+### Getting Started Guide
+To get started using CloudBees Core read our [Getting Started Guide](https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/getting-started/#).
+
+### Additional Resources
+[CloudBees Core Administration Guide](https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/)
+
+[CloudBees Core Reference Architecture](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/)
+
+### CloudBees Core Support
+For CloudBees Core support, [visit the CloudBees support page](https://support.cloudbees.com/hc/en-us/requests).
 
