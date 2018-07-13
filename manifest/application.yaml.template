@@ -17,11 +17,11 @@ spec:
     description: |-
       CloudBees is building the world’s first end-to-end automated software delivery system. We provide smart solutions for continuous development, integration and delivery. By making the software delivery process more productive, manageable and hassle-free, CloudBees puts companies on the fast track to transforming great ideas into great software and delivering value to their business more quickly.
     links:
-      - description: Getting Started Guide
+    - description: Getting Started Guide
       url: https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/getting-started/#
-      - description: CloudBees Core Administration Guide
+    - description: CloudBees Core Administration Guide
       url: https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/
-      - description: CloudBees Core Reference Architecture
+    - description: CloudBees Core Reference Architecture
       url: https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/
     notes: |-
       ### Next Steps
