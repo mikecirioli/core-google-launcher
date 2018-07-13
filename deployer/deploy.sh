@@ -122,7 +122,7 @@ create_manifests.sh
   --manifest "/data/cje.yaml" \
   --status "Pending"
 
-install_cje "/data/cje.yml"
+install_cje "/data/cje.yaml"
 
 patch_assembly_phase.sh --status="Success"
 
