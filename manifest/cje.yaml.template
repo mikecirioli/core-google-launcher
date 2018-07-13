@@ -39,8 +39,6 @@ metadata:
 spec:
   serviceName: cjoc
   replicas: 1
-  updateStrategy:
-    type: RollingUpdate
   template:
     metadata:
       name: cjoc
