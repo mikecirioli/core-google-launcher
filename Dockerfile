@@ -24,5 +24,6 @@ COPY deployer/deploy.sh /bin/
 COPY deployer/deploy_with_tests.sh /bin/
 COPY schema.yaml /data/
 COPY manifest /data/manifest
+COPY manifest-ingress /data/manifest-ingress
 
 ENTRYPOINT ["/bin/bash", "/bin/deploy.sh"]
