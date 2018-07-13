@@ -24,7 +24,6 @@ spec:
     - description: CloudBees Core Reference Architecture
       url: https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/
     notes: |-
-      ### Next Steps
       Get the CloudBees Core Operations Center URL:
 
       ```shell
