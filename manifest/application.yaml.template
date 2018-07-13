@@ -16,8 +16,15 @@ spec:
     version: '2.121.1.2'
     description: |-
       CloudBees is building the world’s first end-to-end automated software delivery system. We provide smart solutions for continuous development, integration and delivery. By making the software delivery process more productive, manageable and hassle-free, CloudBees puts companies on the fast track to transforming great ideas into great software and delivering value to their business more quickly.
-
-      	### Next Steps
+	links:
+    - description: Getting Started Guide
+      url: https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/getting-started/#
+     - description: CloudBees Core Administration Guide
+      url: https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/
+     - description: CloudBees Core Reference Architecture
+      url: https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/
+    notes: |-
+		### Next Steps
 		Get the CloudBees Core Operations Center URL:
 
 		```shell
@@ -41,13 +48,6 @@ spec:
 
 		### CloudBees Core Support
 		For CloudBees Core support, [visit the CloudBees support page](https://support.cloudbees.com/hc/en-us/requests).
-	links:
-    - description: Getting Started Guide
-      url: https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/getting-started/#
-     - description: CloudBees Core Administration Guide
-      url: https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/
-     - description: CloudBees Core Reference Architecture
-      url: https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/
   selector:
     matchLabels:
       app.kubernetes.io/name: "$name"
