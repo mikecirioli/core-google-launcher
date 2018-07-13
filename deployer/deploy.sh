@@ -104,7 +104,7 @@ create_manifests.sh
 # Ensure assembly phase is "Pending", until successful kubectl apply.
 /bin/setassemblyphase.py \
   --manifest "/data/ingress-controller.yaml" \
-  --status "Ingress Controller Pending"
+  --status "Pending"
 
 install_ingress_controller "/data/ingress-controller.yaml"
 
@@ -121,7 +121,7 @@ install_ingress_controller "/data/ingress-controller.yaml"
 # Ensure assembly phase is "Pending", until successful kubectl apply.
 /bin/setassemblyphase.py \
   --manifest "/data/cje.yaml" \
-  --status "CloudBees Jenkins Enterprise Pending"
+  --status "Pending"
 
 install_cje "/data/cje.yml"
 
