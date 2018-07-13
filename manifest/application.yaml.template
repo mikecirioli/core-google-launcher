@@ -15,7 +15,7 @@ spec:
     type: CloudBees
     version: '2.121.1.2'
     description: |-
-	  CloudBees is building the world’s first end-to-end automated software delivery system. We provide smart solutions for continuous development, integration and delivery. By making the software delivery process more productive, manageable and hassle-free, CloudBees puts companies on the fast track to transforming great ideas into great software and delivering value to their business more quickly.
+      CloudBees is building the world’s first end-to-end automated software delivery system. We provide smart solutions for continuous development, integration and delivery. By making the software delivery process more productive, manageable and hassle-free, CloudBees puts companies on the fast track to transforming great ideas into great software and delivering value to their business more quickly.
 	links:
     - description: Getting Started Guide
       url: https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/getting-started/#
@@ -24,30 +24,30 @@ spec:
      - description: CloudBees Core Reference Architecture
       url: https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/
     notes: |-
-	  ### Next Steps
-	  Get the CloudBees Core Operations Center URL:
+      ### Next Steps
+      Get the CloudBees Core Operations Center URL:
 
-	  ```shell
-	  kubectl get ing -n <namespace> | grep cjoc
-	  ```
-	  Paste the domain name listed into your browser to go to the CloudBees Core Operations Center and start the setup process. 
+      ```shell
+      kubectl get ing -n <namespace> | grep cjoc
+      ```
+      Paste the domain name listed into your browser to go to the CloudBees Core Operations Center and start the setup process. 
 
-	  Or you can click on the cjoc Endpoints link under Kubernetes Engine > Services in the GCP console.
+      Or you can click on the cjoc Endpoints link under Kubernetes Engine > Services in the GCP console.
 
-	  The setup process will prompt you for an intial admin password. Execute this command to get it:
+      The setup process will prompt you for an intial admin password. Execute this command to get it:
  
-	  ```shell
-	  kubectl exec cjoc-0 -n <namespace> -- cat /var/jenkins_home/secrets/initialAdminPassword
-	  ```
-	  You can use the Connect button at Kubernetes Engine > Clusters to launch Cloud Shell to issue this command.
+      ```shell
+      kubectl exec cjoc-0 -n <namespace> -- cat /var/jenkins_home/secrets/initialAdminPassword
+      ```
+      You can use the Connect button at Kubernetes Engine > Clusters to launch Cloud Shell to issue this command.
 
-	  Follow the steps in the setup wizard to complete the installation.
+      Follow the steps in the setup wizard to complete the installation.
 
-	  ## Using CloudBees Core
-	  To get started using CloudBees Core read our [Getting Started Guide](https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/getting-started/#).
+      ## Using CloudBees Core
+      To get started using CloudBees Core read our [Getting Started Guide](https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/getting-started/#).
 
-	  ### CloudBees Core Support
-	  For CloudBees Core support, [visit the CloudBees support page](https://support.cloudbees.com/hc/en-us/requests).
+      ### CloudBees Core Support
+      For CloudBees Core support, [visit the CloudBees support page](https://support.cloudbees.com/hc/en-us/requests).
   selector:
     matchLabels:
       app.kubernetes.io/name: "$name"
