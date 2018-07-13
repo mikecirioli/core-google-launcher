@@ -10,3 +10,10 @@ spec:
   descriptor:
     type: CloudBees
     version: '2.121.1.2'
+  componentKinds:
+    - group: v1beta1
+      kind: Deployment
+    - group: v1
+      kind: Service
+    - group: v1
+      kind: ConfigMap
