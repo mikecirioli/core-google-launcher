@@ -106,11 +106,7 @@ create_manifests.sh
   --manifest "/data/ingress-controller.yaml" \
   --status "Pending"
 
-#set clusteradmin privileges
-kubectl create clusterrolebinding cluster-admin-binding  --clusterrole clusteradmin  --user $(gcloud config get-value account)
-
 install_ingress_controller "/data/ingress-controller.yaml"
-
 
 ###cje###
 # Assign owner references for the resources.

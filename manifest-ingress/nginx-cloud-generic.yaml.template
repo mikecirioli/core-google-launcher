@@ -2,7 +2,6 @@ kind: Service
 apiVersion: v1
 metadata:
   name: ingress-nginx
-  namespace: ingress-nginx
   labels:
     app: ingress-nginx
 spec:
