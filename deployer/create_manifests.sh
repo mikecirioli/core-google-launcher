@@ -50,6 +50,8 @@ if [[ "$mode" = "test" ]]; then
   fi
 fi
 
+echo "${env_vars}"
+
 # Replace the environment variables placeholders from the manifest templates
 for manifest_template_file in "$data_dir"/manifest/*; do
   manifest_file=$(basename "$manifest_template_file" | sed 's/.template$//')
@@ -61,6 +63,7 @@ done
 # Replace the environment variables placeholders from the manifest templates
 for manifest_template_file in "$data_dir"/manifest-ingress/*; do
   manifest_file=$(basename "$manifest_template_file" | sed 's/.template$//')
+  echo "$manifest_template_file -> $manifest_ingress_dir/$manifest_file"
   cat "$manifest_template_file" \
     | /bin/config_env.py envsubst "${env_vars}" \
     > "$manifest_ingress_dir/$manifest_file"
