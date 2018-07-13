@@ -1,6 +1,6 @@
 # Overview
 
-Repository with scripts to configure and launch CloudBees Core on GKE.
+Repository with scripts to configure and launch CloudBees Core on Google Container Enginer (GKE). This installation package supports 
 
 # Getting Started
 
@@ -49,21 +49,20 @@ make app/install
 make app/watch
 ```
 
-### Go to the CloudBees Jenkins Operation Center
-
-```shell
-make app/watch
-```
-
-### Get Your Initial Admin Password
-
 ### Setup Wizard
-
-### Delete the Installation (optional)
+Get the CloudBees Core Operations Center URL:
 
 ```shell
-make app/uninstall
+kubectl get ing -n <namespace> | grep cjoc
 ```
+Paste the domain name listed into your browser to go to the CloudBees Core Operations Center and start the setup process. The installation process requires an intial admin password. Execute this command to get it:
+
+```shell
+kubectl exec cjoc-0 -n <namespace> -- cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
+Then follow the instructions in the setup wizard to complete the installation.
+
 ## Using CloudBees Core
 
 ### Getting Started Guide
@@ -76,4 +75,10 @@ To get started using CloudBees Core read our [Getting Started Guide](https://go.
 
 ### CloudBees Core Support
 For CloudBees Core support, [visit the CloudBees support page](https://support.cloudbees.com/hc/en-us/requests).
+
+### Delete the Installation (optional)
+
+```shell
+make app/uninstall
+```
 

@@ -4,6 +4,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cjoc-config
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: cjoc-config
 data:
   master-provisioning-kubernetes.json: |
     {
@@ -23,6 +26,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cjoc-configure-jenkins-groovy
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: cjoc-configure-jenkins-groovy
 data:
   location.groovy: |
     hudson.ExtensionList.lookupSingleton(com.cloudbees.jenkins.support.impl.cloudbees.TcpSlaveAgentListenerMonitor.class).disable(true)
@@ -36,6 +42,8 @@ metadata:
   labels:
     com.cloudbees.cje.type: cjoc
     com.cloudbees.cje.tenant: cjoc
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: cjoc
 spec:
   serviceName: cjoc
   replicas: 1
@@ -72,6 +80,7 @@ spec:
             -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImage=gcr.io/cje-marketplace-dev/cloudbees/cje-mm:latest
             -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.storageClassName=$namespace-$name-ssd
             -Dcom.cloudbees.jce.masterprovisioning.ContainerMasterProvisioningDescriptor.memory=3072
+            -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.serviceAccount=$name-jenkins
         - name: MEM_LIMIT
           valueFrom:
             resourceFieldRef:
@@ -124,6 +133,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: cjoc
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: cjoc-service
 spec:
   # type: LoadBalancer
   selector:
@@ -141,6 +153,9 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: cjoc
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: cjoc-ingress
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/app-root: "/cjoc/teams-check/"
@@ -170,6 +185,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: jenkins-agent
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: jenkins-agent-config
 data:
   jenkins-agent: |
     #!/usr/bin/env sh
