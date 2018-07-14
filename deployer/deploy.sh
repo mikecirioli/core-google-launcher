@@ -155,6 +155,22 @@ install_ingress_controller "/data/ingress-controller.yaml"
   --manifest "/data/cje.yaml" \
   --status "Pending"
 
+#generate a self-signed cert
+KEY_NAME="server"
+CSR_CONFIG=/data/server.config
+
+openssl req -config $CSR_CONFIG -new -newkey rsa:2048 -nodes -keyout ${KEY_NAME}.key -out ${KEY_NAME}.csr
+
+echo "Created ${KEY_NAME}.key"
+echo "Created ${KEY_NAME}.csr"
+
+if [[ -n $SELF_SIGN ]]; then
+  openssl x509 -req -days 365 -in ${KEY_NAME}.csr -signkey ${KEY_NAME}.key -out ${KEY_NAME}.crt
+  echo "Created ${KEY_NAME}.crt (self-signed)"
+fi
+
+kubectl create secret tls {$NAME}-tls --cert=server.crt --key=server.key
+
 install_cje "/data/cje.yaml"
 
 patch_assembly_phase.sh --status="Success"

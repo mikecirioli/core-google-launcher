@@ -7,6 +7,9 @@ RUN apt-get upgrade
 # Install curl
 RUN apt-get -y install curl
 
+# Install openssl
+RUN apt-get -y install openssl
+
 # Install gcloud
 RUN apt-get -y install gnupg2
 RUN apt-get -y install lsb-release
@@ -23,6 +26,7 @@ COPY deployer/create_manifests.sh /bin/
 COPY deployer/deploy.sh /bin/
 COPY deployer/deploy_with_tests.sh /bin/
 COPY schema.yaml /data/
+COPY server.config /data/
 COPY manifest /data/manifest
 COPY manifest-ingress /data/manifest-ingress
 

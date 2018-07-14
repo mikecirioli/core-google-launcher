@@ -165,11 +165,11 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
 spec:
   # To enable SSL offloading at ingress level, uncomment the following 5 lines
-  #tls:
-  #- hosts:
-  #  - cje.example.com
-  #  # Name of the secret containing the certificate to be used
-  #  secretName: cje-example-com-tls
+  tls:
+  - hosts:
+    - cje.example.com
+    # Name of the secret containing the certificate to be used
+    secretName: $name-tls
   rules:
   - http:
       paths:
