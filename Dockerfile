@@ -1,4 +1,4 @@
-FROM gcr.io/cje-marketplace-dev/deployer_envsubst_base:latest
+FROM gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:latest
 
 # Update apt
 RUN apt-get update

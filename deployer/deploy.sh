@@ -167,7 +167,7 @@ echo "Created ${KEY_NAME}.csr"
 openssl x509 -req -days 365 -in ${KEY_NAME}.csr -signkey ${KEY_NAME}.key -out ${KEY_NAME}.crt
 echo "Created ${KEY_NAME}.crt (self-signed)"
 
-kubectl create secret tls {$NAME}-tls --cert=server.crt --key=server.key
+kubectl create secret tls $NAME-tls --cert=server.crt --key=server.key
 
 install_cje "/data/cje.yaml"
 
