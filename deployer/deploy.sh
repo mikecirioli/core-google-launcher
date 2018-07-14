@@ -164,10 +164,8 @@ openssl req -config $CSR_CONFIG -new -newkey rsa:2048 -nodes -keyout ${KEY_NAME}
 echo "Created ${KEY_NAME}.key"
 echo "Created ${KEY_NAME}.csr"
 
-if [[ -n $SELF_SIGN ]]; then
-  openssl x509 -req -days 365 -in ${KEY_NAME}.csr -signkey ${KEY_NAME}.key -out ${KEY_NAME}.crt
-  echo "Created ${KEY_NAME}.crt (self-signed)"
-fi
+openssl x509 -req -days 365 -in ${KEY_NAME}.csr -signkey ${KEY_NAME}.key -out ${KEY_NAME}.crt
+echo "Created ${KEY_NAME}.crt (self-signed)"
 
 kubectl create secret tls {$NAME}-tls --cert=server.crt --key=server.key
 
