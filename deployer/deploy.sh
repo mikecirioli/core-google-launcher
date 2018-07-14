@@ -93,6 +93,8 @@ create_cert(){
   local config_file; config_file=$(mktemp)
   cp $source $config_file
 
+  sed -i -e "s#cje.example.com#$(get_domain_name)#" "$config_file"
+
   openssl req -config "$config_file" -new -newkey rsa:2048 -nodes -keyout server.key -out server.csr
 
   echo "Created server.key"
