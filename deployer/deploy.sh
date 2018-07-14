@@ -87,6 +87,23 @@ install_ingress_controller() {
     echo "NGINX INGRESS: $INGRESS_IP"
 }
 
+#create self-signed cert
+create_cert(){
+  local source=/data/server.config
+  local config_file; config_file=$(mktemp)
+  cp $source $config_file
+
+  openssl req -config "$config_file" -new -newkey rsa:2048 -nodes -keyout server.key -out server.csr
+
+  echo "Created server.key"
+  echo "Created server.csr"
+
+  openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+  echo "Created server.crt (self-signed)"
+
+  kubectl create secret tls $NAME-tls --cert=server.crt --key=server.key
+}
+
 # This is the entry point for the production deployment
 
 # If any command returns with non-zero exit code, set -e will cause the script
@@ -156,18 +173,7 @@ install_ingress_controller "/data/ingress-controller.yaml"
   --status "Pending"
 
 #generate a self-signed cert
-KEY_NAME="server"
-CSR_CONFIG=/data/server.config
-
-openssl req -config $CSR_CONFIG -new -newkey rsa:2048 -nodes -keyout ${KEY_NAME}.key -out ${KEY_NAME}.csr
-
-echo "Created ${KEY_NAME}.key"
-echo "Created ${KEY_NAME}.csr"
-
-openssl x509 -req -days 365 -in ${KEY_NAME}.csr -signkey ${KEY_NAME}.key -out ${KEY_NAME}.crt
-echo "Created ${KEY_NAME}.crt (self-signed)"
-
-kubectl create secret tls $NAME-tls --cert=server.crt --key=server.key
+create_cert
 
 install_cje "/data/cje.yaml"
 
