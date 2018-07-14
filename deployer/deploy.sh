@@ -97,11 +97,17 @@ create_cert(){
 
   openssl req -config "$config_file" -new -newkey rsa:2048 -nodes -keyout server.key -out server.csr
 
+  pwd
+  ls
+
   echo "Created server.key"
   echo "Created server.csr"
 
   openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
   echo "Created server.crt (self-signed)"
+  pwd
+  ls
+  openssl x509 -in server.crt -text -noout
 
   kubectl create secret tls $NAME-tls --cert=server.crt --key=server.key
 }
