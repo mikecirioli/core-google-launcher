@@ -87,6 +87,25 @@ install_ingress_controller() {
     echo "NGINX INGRESS: $INGRESS_IP"
 }
 
+#create self-signed cert
+create_cert(){
+  local source=/data/server.config
+  local config_file; config_file=$(mktemp)
+  cp $source $config_file
+
+  sed -i -e "s#cje.example.com#$(get_domain_name)#" "$config_file"
+
+  openssl req -config "$config_file" -new -newkey rsa:2048 -nodes -keyout server.key -out server.csr
+
+  echo "Created server.key"
+  echo "Created server.csr"
+
+  openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+  echo "Created server.crt (self-signed)"
+
+  kubectl create secret tls $NAME-tls --cert=server.crt --key=server.key
+}
+
 # This is the entry point for the production deployment
 
 # If any command returns with non-zero exit code, set -e will cause the script
@@ -155,7 +174,14 @@ install_ingress_controller "/data/ingress-controller.yaml"
   --manifest "/data/cje.yaml" \
   --status "Pending"
 
+#generate a self-signed cert
+create_cert
+
 install_cje "/data/cje.yaml"
+
+patch_assembly_phase.sh --status="Success"
+
+clean_iam_resources.sh
 
 echo "CloudBees Jenkins Enterprise is installed and running at http://$(get_domain_name)/cjoc."
 
@@ -177,9 +203,5 @@ else
   echo "CloudBees Jenkins Enterprise launched successfully."
   exit 0
 fi
-
-patch_assembly_phase.sh --status="Success"
-
-clean_iam_resources.sh
 
 trap - EXIT

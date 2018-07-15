@@ -8,6 +8,21 @@ properties:
     type: string
     x-google-marketplace:
       type: NAMESPACE
+  deployerImage:
+    type: string
+    default: $REGISTRY/cloudbees/deployer:latest
+    x-google-marketplace:
+      type: IMAGE
+  cjocImage:
+    type: string
+    default: $REGISTRY/cloudbees/cje-oc:latest
+    x-google-marketplace:
+      type: IMAGE
+  mmImage:
+    type: string
+    default: $REGISTRY/cloudbees/cje-mm:latest
+    x-google-marketplace:
+      type: IMAGE
   nginx:
     type: string
     x-google-marketplace:

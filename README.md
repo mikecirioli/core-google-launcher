@@ -1,8 +1,18 @@
 # Overview
 
-Repository with scripts to configure and launch CloudBees Core on Google Container Enginer (GKE). This installation package supports 
+This repository contains the GCP Marketplace deployment resources to launch CloudBees Core on Google Container Enginer (GKE). 
 
 # Getting Started
+
+## Tool dependencies
+
+- [gcloud](https://cloud.google.com/sdk/)
+- [docker](https://docs.docker.com/install/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/). You can install
+  this tool as part of `gcloud`.
+- [jq](https://github.com/stedolan/jq/wiki/Installation)
+- [make](https://www.gnu.org/software/make/)
+- [watch command](https://en.wikipedia.org/wiki/Watch_(Unix))
 
 ## Set Your GCP Config and Authenticate
 
@@ -11,6 +21,22 @@ gcloud config set project <GCP Project>
 gcloud config set compute/zone <zone>
 gcloud config set account <user>
 gcloud auth login
+```
+## Google Container Registry (GCR)
+
+Make files are set up to use Google Container Registry (GCR). Ensure that you GCR enabled for your project. 
+
+[Enable the GCR API](https://console.cloud.google.com/apis/library/containerregistry.googleapis.com)
+
+## Building the Deployer Image
+Build from the [Dockerfile](https://github.com/cloudbees/core-google-launcher/blob/master/Dockerfile).
+
+```shell
+docker build -t deployer:latest .
+
+docker tag deployer:latest gcr.io/<gcp project>/deployer:latest
+
+docker push gcr.io/<gcp project>/deployer:latest
 ```
 
 ## Create Your Cluster
@@ -55,30 +81,45 @@ Get the CloudBees Core Operations Center URL:
 ```shell
 kubectl get ing -n <namespace> | grep cjoc
 ```
-Paste the domain name listed into your browser to go to the CloudBees Core Operations Center and start the setup process. The installation process requires an intial admin password. Execute this command to get it:
+Paste the domain name listed into your browser to go to the CloudBees Core Operations Center and start the setup process. Or you can click on the cjoc Endpoints link under Kubernetes Engine > Services in the GCP console.
+
+The installation process requires an intial admin password. Execute this command to get it:
 
 ```shell
 kubectl exec cjoc-0 -n <namespace> -- cat /var/jenkins_home/secrets/initialAdminPassword
 ```
 
-Then follow the instructions in the setup wizard to complete the installation.
+You can use the Connect button at Kubernetes Engine > Clusters to launch Cloud Shell to issue this command.
+
+Follow the steps in the setup wizard to complete the installation.
 
 ## Using CloudBees Core
 
 ### Getting Started Guide
 To get started using CloudBees Core read our [Getting Started Guide](https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/getting-started/#).
 
-### Additional Resources
+## DNS
+The installation configures an xip.io domain. To configure a customer DNS, read [Creating DNS Record](https://go.cloudbees.com/docs/cloudbees-core/cloud-install-guide/gke-install/#creating-dns-record).
+
+## HTTPS
+The instllation configured a self-signed certificate. To configure your own SSL certificate, read [Ingress TLS Termination](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/ra-for-gke/#_ingress_tls_termination).
+
+## Additional Resources
 [CloudBees Core Administration Guide](https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/)
 
 [CloudBees Core Reference Architecture](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/)
 
-### CloudBees Core Support
+## CloudBees Core Support
 For CloudBees Core support, [visit the CloudBees support page](https://support.cloudbees.com/hc/en-us/requests).
 
-### Delete the Installation (optional)
+## Delete the Installation (optional)
 
 ```shell
 make app/uninstall
+```
+or
+
+```shell
+kubectl delete application <application> -n <namespace>
 ```
 
