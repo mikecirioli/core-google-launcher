@@ -66,7 +66,7 @@ install_cje() {
     kubectl apply -f "$install_file"
 
     echo "Waiting for CJE to start"
-    TIMEOUT=10 retry_command curl -sSLf -o /dev/null http://$(get_domain_name)/cjoc/login
+    TIMEOUT=10 retry_command curl -skSLf -o /dev/null http://$(get_domain_name)/cjoc/login
 }
 
 # Installs ingress controller
@@ -186,7 +186,7 @@ clean_iam_resources.sh
 echo "CloudBees Jenkins Enterprise is installed and running at http://$(get_domain_name)/cjoc."
 
 # Test #1 console validation
-if curl -s "http://$(get_domain_name)/cjoc/login" | grep "Unlock Jenkins"; then
+if curl -skSLf "http://$(get_domain_name)/cjoc/login" | grep "Unlock Jenkins"; then
   echo "CloudBees Jenkins Enterprise launched successfully."
   exit 0
 else

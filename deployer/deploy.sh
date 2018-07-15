@@ -66,7 +66,7 @@ install_cje() {
     kubectl apply -f "$install_file"
 
     echo "Waiting for CJE to start"
-    TIMEOUT=10 retry_command curl -sSLf -o /dev/null http://$(get_domain_name)/cjoc/login
+    TIMEOUT=10 retry_command curl -skSLf -o /dev/null http://$(get_domain_name)/cjoc/login
 }
 
 # Installs ingress controller
