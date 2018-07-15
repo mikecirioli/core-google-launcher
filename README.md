@@ -34,9 +34,9 @@ Build from the [Dockerfile](https://github.com/cloudbees/core-google-launcher/bl
 ```shell
 docker build -t deployer:latest .
 
-docker tag deployer:latest gcr.io/<gcp project>/deployer:latest
+docker tag deployer:latest gcr.io/<path>/deployer:<tag>
 
-docker push gcr.io/<gcp project>/deployer:latest
+docker push gcr.io/<path>/deployer:<tag>
 ```
 
 ## Create Your Cluster
