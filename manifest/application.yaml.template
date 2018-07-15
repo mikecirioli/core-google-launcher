@@ -46,10 +46,10 @@ spec:
       To get started using CloudBees Core read our [Getting Started Guide](https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/getting-started/#).
 
       ## DNS
-      To configure a customer DNS, read [Creating DNS Record](https://go.cloudbees.com/docs/cloudbees-core/cloud-install-guide/gke-install/#creating-dns-record).
+      The installation configures an xip.io domain. To configure a custom DNS, read [Creating DNS Record](https://go.cloudbees.com/docs/cloudbees-core/cloud-install-guide/gke-install/#creating-dns-record).
 
       ## HTTPS
-      To configure your own SSL certificate, read [Ingress TLS Termination](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/ra-for-gke/#_ingress_tls_termination).
+      The installation configures a self-signed certificate. To configure your own SSL certificate, read [Ingress TLS Termination](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/ra-for-gke/#_ingress_tls_termination).
 
       ### CloudBees Core Support
       For CloudBees Core support, [visit the CloudBees support page](https://support.cloudbees.com/hc/en-us/requests).

@@ -60,11 +60,10 @@ app/install:: app/build \
 app/install-test:: app/build \
                    .build/var/MARKETPLACE_TOOLS_PATH \
                    .build/var/APP_DEPLOYER_IMAGE \
-                   .build/var/APP_PARAMETERS \
-                   .build/var/APP_TEST_PARAMETERS
+                   .build/var/APP_PARAMETERS
 	$(MARKETPLACE_TOOLS_PATH)/scripts/start.sh \
 	    --deployer='$(APP_DEPLOYER_IMAGE)' \
-	    --parameters='$(call combined_parameters)' \
+	    --parameters='$(APP_PARAMETERS)' \
 	    --entrypoint='/bin/deploy_with_tests.sh'
 
 
