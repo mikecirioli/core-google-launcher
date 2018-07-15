@@ -193,13 +193,4 @@ else
   exit 1
 fi
 
-# Test #2 check initial password
-initialAdminPassword=$(kubectl exec cjoc-0 -- cat /var/jenkins_home/secrets/initialAdminPassword)
-if [ -z "$initialAdminPassword"]; then
-  echo "initialAdminPassword is NOT available. Test failed."
-    exit 1
-else
-  echo "initialAdminPassword is available. Test passed."
-fi
-
 trap - EXIT
