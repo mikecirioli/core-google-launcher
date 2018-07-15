@@ -187,21 +187,19 @@ echo "CloudBees Jenkins Enterprise is installed and running at http://$(get_doma
 
 # Test #1 console validation
 if curl -skSLf "http://$(get_domain_name)/cjoc/login" | grep "Unlock Jenkins"; then
-  echo "CloudBees Jenkins Enterprise launched successfully."
-  exit 0
+  echo "CloudBees Core setup wizard is available. Test passed."
 else
-  echo "CloudBees Jenkins Enterprise failed to launch. CJOC not available."
+  echo "CloudBees Core setup wizard is NOT available. Test failed."
   exit 1
 fi
 
 # Test #2 check initial password
 initialAdminPassword=$(kubectl exec cjoc-0 -- cat /var/jenkins_home/secrets/initialAdminPassword)
 if [ -z "$initialAdminPassword"]; then
-  echo "CloudBees Jenkins Enterprise failed to launch"
+  echo "initialAdminPassword is NOT available. Test failed."
     exit 1
 else
-  echo "CloudBees Jenkins Enterprise launched successfully."
-  exit 0
+  echo "initialAdminPassword is available. Test passed."
 fi
 
 trap - EXIT
