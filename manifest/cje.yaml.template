@@ -40,8 +40,8 @@ kind: "StatefulSet"
 metadata:
   name: $name-cjoc
   labels:
-    com.cloudbees.cje.type: $name-cjoc
-    com.cloudbees.cje.tenant: $name-cjoc
+    com.cloudbees.cje.type: cjoc
+    com.cloudbees.cje.tenant: cjoc
     app.kubernetes.io/name: "$name"
     app.kubernetes.io/component: cjoc
 spec:
@@ -139,7 +139,7 @@ metadata:
 spec:
   # type: LoadBalancer
   selector:
-    com.cloudbees.cje.tenant: $name-cjoc
+    com.cloudbees.cje.tenant: cjoc
   ports:
   - name: http
     port: 80
