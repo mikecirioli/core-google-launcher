@@ -10,34 +10,19 @@ properties:
       type: NAMESPACE
   cjocImage:
     type: string
+    description: This is the CloudBees Core Operations Center image.
     default: gcr.io/cje-marketplace-dev/cloudbees:2
     x-google-marketplace:
       type: IMAGE
   mmImage:
     type: string
+    description: This is the Jenkins Managed Master image.
     default: gcr.io/cje-marketplace-dev/cloudbees/cje-mm:2
     x-google-marketplace:
       type: IMAGE
-  nginxServiceAccount:
+  cloudBeesCoreServiceAccount:
     type: string
-    x-google-marketplace:
-      type: SERVICE_ACCOUNT
-      serviceAccount:
-        roles:
-        - type: ClusterRole
-          rulesType: PREDEFINED
-          rulesFromRoleName: cluster-admin
-  cjocServiceAccount:
-    type: string
-    x-google-marketplace:
-      type: SERVICE_ACCOUNT
-      serviceAccount:
-        roles:
-        - type: ClusterRole
-          rulesType: PREDEFINED
-          rulesFromRoleName: cluster-admin
-  jenkinsServiceAccount:
-    type: string
+    description: This is the name of the ServiceAccount that is used to deploy CloudBees Core Operations Center and Jenkins Managed Masters.
     x-google-marketplace:
       type: SERVICE_ACCOUNT
       serviceAccount:
@@ -47,6 +32,7 @@ properties:
           rulesFromRoleName: cluster-admin
   ssd:
     type: string
+    description: This is the name of the SSD storage that will be provisioned.
     x-google-marketplace:
       type: STORAGE_CLASS
       storageClass:
@@ -56,7 +42,5 @@ required:
 - namespace
 - cjocImage
 - mmImage
-- nginxServiceAccount
-- cjocServiceAccount
-- jenkinsServiceAccount
+- cloudBeesCoreServiceAccount
 - ssd
