@@ -54,6 +54,7 @@ spec:
         com.cloudbees.cje.type: cjoc
         com.cloudbees.cje.tenant: cjoc
     spec:
+      hostname: cjoc #had to add this due to the dollar sign name references
       serviceAccountName: $cjocServiceAccount
       terminationGracePeriodSeconds: 10
       containers:
