@@ -18,7 +18,7 @@ data:
       ],
       "envVars": "JAVA_OPTS+MANAGED_MASTER = -XshowSettings:vm -XX:+AlwaysPreTouch -XX:+UseG1GC -XX:+ExplicitGCInvokesConcurrent -XX:+ParallelRefProcEnabled -XX:+UseStringDeduplication -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=40m -Xloggc:$JENKINS_HOME/gc.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintHeapAtGC -XX:+PrintGCCause -XX:+PrintTenuringDistribution -XX:+PrintReferenceGC -XX:+PrintAdaptiveSizePolicy",
       "systemProperties": "hudson.slaves.NodeProvisioner.initialDelay=0",
-      "jenkinsUrl": "http://cjoc/cjoc"
+      "jenkinsUrl": "http://$name-cjoc/cjoc"
     }
 
 ---
@@ -45,7 +45,7 @@ metadata:
     app.kubernetes.io/name: "$name"
     app.kubernetes.io/component: cjoc
 spec:
-  serviceName: cjoc
+  serviceName: $name-cjoc
   replicas: 1
   template:
     metadata:
@@ -132,7 +132,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cjoc
+  name: $name-cjoc
   labels:
     app.kubernetes.io/name: "$name"
     app.kubernetes.io/component: cjoc-service
@@ -175,7 +175,7 @@ spec:
       paths:
       - path: /cjoc
         backend:
-          serviceName: cjoc
+          serviceName: $name-cjoc
           servicePort: 80
     host: cje.example.com
 # Service account for masters
