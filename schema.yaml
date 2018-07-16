@@ -10,7 +10,7 @@ properties:
       type: NAMESPACE
   cjocImage:
     type: string
-    default: gcr.io/cje-marketplace-dev/cloudbees/cje-oc:2
+    default: gcr.io/cje-marketplace-dev/cloudbees:2
     x-google-marketplace:
       type: IMAGE
   mmImage:
