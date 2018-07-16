@@ -10,12 +10,12 @@ properties:
       type: NAMESPACE
   cjocImage:
     type: string
-    default: $REGISTRY/cloudbees/cje-oc:latest
+    default: gcr.io/cje-marketplace-dev/cloudbees/cje-oc:latest
     x-google-marketplace:
       type: IMAGE
   mmImage:
     type: string
-    default: $REGISTRY/cloudbees/cje-mm:latest
+    default: gcr.io/cje-marketplace-dev/cloudbees/cje-mm:latest
     x-google-marketplace:
       type: IMAGE
   nginxServiceAccount:
