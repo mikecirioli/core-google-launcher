@@ -84,7 +84,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: $name-ngress-nginx
+      app: $name-ingress-nginx
   template:
     metadata:
       labels:
