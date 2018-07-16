@@ -144,16 +144,7 @@ app_api_version=$(kubectl get "applications/$NAME" \
 
 create_manifests.sh
 
-###ingress-controller creation###
-# Assign owner references for the resources.
-/bin/set_ownership.py \
-  --app_name "$NAME" \
-  --app_uid "$app_uid" \
-  --app_api_version "$app_api_version" \
-  --manifests "/data/manifest-ingress-expanded" \
-  --dest "/data/ingress-controller.yaml"
-
-install_ingress_controller "/data/ingress-controller.yaml"
+install_ingress_controller "/data/manifest-ingress-expanded/nginx.yaml"
 
 ###cje###
 # Assign owner references for the resources.
