@@ -71,7 +71,7 @@ install_cje() {
 
 # Installs ingress controller
 install_ingress_controller() {
-    if [[ -z $(kubectl get svc | grep ingress-nginx ) ]]; then
+    if [[ -z $(kubectl get svc | grep $NAME-ingress-nginx ) ]]; then
       local source=${1:?}
       local install_file; install_file=$(mktemp)
       cp $source $install_file
@@ -82,8 +82,8 @@ install_ingress_controller() {
     fi
     
     
-    while [[ "$(kubectl get svc ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" = '' ]]; do sleep 3; done
-    INGRESS_IP=$(kubectl get svc ingress-nginx  -o jsonpath='{.status.loadBalancer.ingress[0].ip}' | sed 's/"//g')
+    while [[ "$(kubectl get svc $NAME-ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" = '' ]]; do sleep 3; done
+    INGRESS_IP=$(kubectl get svc $NAME-ingress-nginx  -o jsonpath='{.status.loadBalancer.ingress[0].ip}' | sed 's/"//g')
     echo "NGINX INGRESS: $INGRESS_IP"
 }
 
