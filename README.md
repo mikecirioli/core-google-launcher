@@ -80,13 +80,17 @@ Get the CloudBees Core Operations Center URL:
 
 ```shell
 kubectl get ing -n <namespace> | grep cjoc
+
+ex. kubectl get ing -n deployer-test | grep cjoc
 ```
 Paste the domain name listed into your browser to go to the CloudBees Core Operations Center and start the setup process. Or you can click on the cjoc Endpoints link under Kubernetes Engine > Services in the GCP console.
 
 The installation process requires an intial admin password. Execute this command to get it:
 
 ```shell
-kubectl exec cjoc-0 -n <namespace> -- cat /var/jenkins_home/secrets/initialAdminPassword
+kubectl exec <app name>-cjoc-0 -n <namespace> -- cat /var/jenkins_home/secrets/initialAdminPassword
+
+ex. kubectl exec cloudbees-core-1-cjoc-0 -n deployer-test -- cat /var/jenkins_home/secrets/initialAdminPassword
 ```
 
 You can use the Connect button at Kubernetes Engine > Clusters to launch Cloud Shell to issue this command.
