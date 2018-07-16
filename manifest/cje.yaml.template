@@ -175,7 +175,7 @@ spec:
       paths:
       - path: /cjoc
         backend:
-          serviceName: cjoc
+          serviceName: $name-cjoc
           servicePort: 80
     host: cje.example.com
 # Service account for masters
