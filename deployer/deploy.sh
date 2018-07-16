@@ -153,11 +153,6 @@ create_manifests.sh
   --manifests "/data/manifest-ingress-expanded" \
   --dest "/data/ingress-controller.yaml"
 
-# Ensure assembly phase is "Pending", until successful kubectl apply.
-/bin/setassemblyphase.py \
-  --manifest "/data/ingress-controller.yaml" \
-  --status "Pending"
-
 install_ingress_controller "/data/ingress-controller.yaml"
 
 ###cje###

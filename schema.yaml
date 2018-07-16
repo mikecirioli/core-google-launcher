@@ -8,11 +8,6 @@ properties:
     type: string
     x-google-marketplace:
       type: NAMESPACE
-  deployerImage:
-    type: string
-    default: $REGISTRY/cloudbees/deployer:latest
-    x-google-marketplace:
-      type: IMAGE
   cjocImage:
     type: string
     default: $REGISTRY/cloudbees/cje-oc:latest
@@ -23,7 +18,7 @@ properties:
     default: $REGISTRY/cloudbees/cje-mm:latest
     x-google-marketplace:
       type: IMAGE
-  nginx:
+  nginxServiceAccount:
     type: string
     x-google-marketplace:
       type: SERVICE_ACCOUNT
@@ -32,7 +27,7 @@ properties:
         - type: ClusterRole
           rulesType: PREDEFINED
           rulesFromRoleName: cluster-admin
-  cjoc:
+  cjocServiceAccount:
     type: string
     x-google-marketplace:
       type: SERVICE_ACCOUNT
@@ -41,7 +36,7 @@ properties:
         - type: ClusterRole
           rulesType: PREDEFINED
           rulesFromRoleName: cluster-admin
-  jenkins:
+  jenkinsServiceAccount:
     type: string
     x-google-marketplace:
       type: SERVICE_ACCOUNT

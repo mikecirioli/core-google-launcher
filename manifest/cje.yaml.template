@@ -54,11 +54,11 @@ spec:
         com.cloudbees.cje.type: cjoc
         com.cloudbees.cje.tenant: cjoc
     spec:
-      serviceAccountName: $name-cjoc
+      serviceAccountName: $cjocServiceAccount
       terminationGracePeriodSeconds: 10
       containers:
       - name: jenkins
-        image: gcr.io/cje-marketplace-dev/cloudbees/cje-oc:latest
+        image: $cjocImage
         env:
         - name: ENVIRONMENT
           value: KUBERNETES
@@ -77,10 +77,10 @@ spec:
             -Dcom.cloudbees.opscenter.analytics.FeederConfiguration.PERIOD=120
             -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.fsGroup=1000
             -Dhudson.lifecycle=hudson.lifecycle.ExitLifecycle
-            -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImage=gcr.io/cje-marketplace-dev/cloudbees/cje-mm:latest
+            -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImage=$mmImage
             -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.storageClassName=$namespace-$name-ssd
             -Dcom.cloudbees.jce.masterprovisioning.ContainerMasterProvisioningDescriptor.memory=3072
-            -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.serviceAccount=$name-jenkins
+            -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.serviceAccount=$jenkinsServiceAccount
         - name: MEM_LIMIT
           valueFrom:
             resourceFieldRef:
