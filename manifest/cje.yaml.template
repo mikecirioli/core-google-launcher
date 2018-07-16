@@ -40,24 +40,24 @@ kind: "StatefulSet"
 metadata:
   name: $name-cjoc
   labels:
-    com.cloudbees.cje.type: cjoc
-    com.cloudbees.cje.tenant: cjoc
+    com.cloudbees.cje.type: $name-cjoc
+    com.cloudbees.cje.tenant: $name-cjoc
     app.kubernetes.io/name: "$name"
     app.kubernetes.io/component: cjoc
 spec:
-  serviceName: cjoc
+  serviceName: $name-cjoc
   replicas: 1
   template:
     metadata:
-      name: cjoc
+      name: $name-cjoc
       labels:
-        com.cloudbees.cje.type: cjoc
-        com.cloudbees.cje.tenant: cjoc
+        com.cloudbees.cje.type: $name-cjoc
+        com.cloudbees.cje.tenant: $name-cjoc
     spec:
       serviceAccountName: $cjocServiceAccount
       terminationGracePeriodSeconds: 10
       containers:
-      - name: jenkins
+      - name: $name-jenkins
         image: $cjocImage
         env:
         - name: ENVIRONMENT
@@ -108,19 +108,19 @@ spec:
           initialDelaySeconds: 300
           timeoutSeconds: 5
       volumes:
-      - name: jenkins-config
+      - name: $name-jenkins-config
         configMap:
-          name: cjoc-config
-      - name: jenkins-configure-jenkins-groovy
+          name: $name-cjoc-config
+      - name: $name-enkins-configure-jenkins-groovy
         configMap:
-          name: cjoc-configure-jenkins-groovy
+          name: $name-cjoc-configure-jenkins-groovy
       securityContext:
         fsGroup: 1000
       imagePullSecrets:
       - name: docker.cloudbees.com
   volumeClaimTemplates:
   - metadata:
-      name: jenkins-home
+      name: $name-jenkins-home
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
@@ -139,7 +139,7 @@ metadata:
 spec:
   # type: LoadBalancer
   selector:
-    com.cloudbees.cje.tenant: cjoc
+    com.cloudbees.cje.tenant: $name-cjoc
   ports:
   - name: http
     port: 80
