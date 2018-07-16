@@ -51,13 +51,13 @@ spec:
     metadata:
       name: $name-cjoc
       labels:
-        com.cloudbees.cje.type: $name-cjoc
-        com.cloudbees.cje.tenant: $name-cjoc
+        com.cloudbees.cje.type: cjoc
+        com.cloudbees.cje.tenant: cjoc
     spec:
       serviceAccountName: $cjocServiceAccount
       terminationGracePeriodSeconds: 10
       containers:
-      - name: $name-jenkins
+      - name: jenkins
         image: $cjocImage
         env:
         - name: ENVIRONMENT
@@ -108,10 +108,10 @@ spec:
           initialDelaySeconds: 300
           timeoutSeconds: 5
       volumes:
-      - name: $name-jenkins-config
+      - name: jenkins-config
         configMap:
           name: $name-cjoc-config
-      - name: $name-enkins-configure-jenkins-groovy
+      - name: jenkins-configure-jenkins-groovy
         configMap:
           name: $name-cjoc-configure-jenkins-groovy
       securityContext:
@@ -120,7 +120,7 @@ spec:
       - name: docker.cloudbees.com
   volumeClaimTemplates:
   - metadata:
-      name: $name-jenkins-home
+      name: jenkins-home
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
@@ -184,7 +184,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: $name-jenkins-agent
+  name: jenkins-agent
   labels:
     app.kubernetes.io/name: "$name"
     app.kubernetes.io/component: jenkins-agent-config
