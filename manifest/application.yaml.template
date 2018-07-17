@@ -11,13 +11,6 @@ metadata:
   labels:
     app.kubernetes.io/name: "$name"
 spec:
-  info:
-  - name: Initial Admin Password
-    valueFrom:
-      secretRef:
-        kind: Secret
-        name: initial-admin-password
-        key: password
   descriptor:
     type: CloudBees
     version: '2.121.1.2'

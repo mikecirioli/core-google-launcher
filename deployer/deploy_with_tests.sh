@@ -131,8 +131,6 @@ install_cje "/data/cje.yaml"
 
 sleep 20
 
-kubectl create secret generic initial-admin-password --from-literal=password=$(kubectl exec $NAME-cjoc-0 -n $NAMESPACE -- cat /var/jenkins_home/secrets/initialAdminPassword)
-
 patch_assembly_phase.sh --status="Success"
 
 clean_iam_resources.sh
