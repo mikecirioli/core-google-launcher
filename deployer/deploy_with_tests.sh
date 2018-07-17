@@ -131,20 +131,12 @@ install_cje "/data/cje.yaml"
 
 sleep 20
 
-kubectl create secret generic initialAdminPassword --from-literal=password=$(kubectl exec $NAME-cjoc-0 -n $NAMESPACE -- cat /var/jenkins_home/secrets/initialAdminPassword)
+kubectl create secret generic initial-admin-password --from-literal=password=$(kubectl exec $NAME-cjoc-0 -n $NAMESPACE -- cat /var/jenkins_home/secrets/initialAdminPassword)
 
 patch_assembly_phase.sh --status="Success"
 
 clean_iam_resources.sh
 
 echo "CloudBees Jenkins Enterprise is installed and running at http://$(get_domain_name)/cjoc."
-
-# Test #1 console validation
-if curl -skSLf "http://$(get_domain_name)/cjoc/login" | grep "Unlock Jenkins"; then
-  echo "CloudBees Core setup wizard is available. Test passed."
-else
-  echo "CloudBees Core setup wizard is NOT available. Test failed."
-  exit 1
-fi
 
 trap - EXIT

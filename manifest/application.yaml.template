@@ -12,16 +12,11 @@ metadata:
     app.kubernetes.io/name: "$name"
 spec:
   info:
-  - name: CloudBees Core Operations Center
-    valueFrom:
-      ingressRef:
-        kind: Ingress
-        path: ${name}-cjoc
   - name: Initial Admin Password
     valueFrom:
       secretRef:
         kind: Secret
-        name: initialAdminPassword
+        name: initial-admin-password
         key: password
   descriptor:
     type: CloudBees

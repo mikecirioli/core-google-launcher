@@ -6,6 +6,7 @@ metadata:
   name: $name-default-http-backend
   labels:
     app: $name-default-http-backend
+    app.kubernetes.io/name: "$name"
 spec:
   replicas: 1
   selector:
@@ -15,6 +16,7 @@ spec:
     metadata:
       labels:
         app: $name-default-http-backend
+        app.kubernetes.io/name: "$name"
     spec:
       terminationGracePeriodSeconds: 60
       containers:
@@ -47,6 +49,7 @@ metadata:
   name: $name-default-http-backend
   labels:
     app: $name-default-http-backend
+    app.kubernetes.io/name: "$name"
 spec:
   ports:
   - port: 80
@@ -61,18 +64,21 @@ metadata:
   name: $name-nginx-configuration
   labels:
     app: $name-ingress-nginx
+    app.kubernetes.io/name: "$name"
 ---
 
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: $name-tcp-services
+  app.kubernetes.io/name: "$name"
 ---
 
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: $name-udp-services
+  app.kubernetes.io/name: "$name"
 
 ---
 
@@ -80,6 +86,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: $name-nginx-ingress-controller
+  app.kubernetes.io/name: "$name"
 spec:
   replicas: 1
   selector:
@@ -89,6 +96,7 @@ spec:
     metadata:
       labels:
         app: $name-ingress-nginx
+        app.kubernetes.io/name: "$name"
       annotations:
         prometheus.io/port: '10254'
         prometheus.io/scrape: 'true'
@@ -155,6 +163,7 @@ metadata:
   name: $name-ingress-nginx
   labels:
     app: $name-ingress-nginx
+    app.kubernetes.io/name: "$name"
 spec:
   externalTrafficPolicy: Local
   type: LoadBalancer
