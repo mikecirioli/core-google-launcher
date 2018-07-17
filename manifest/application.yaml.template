@@ -16,7 +16,13 @@ spec:
     valueFrom:
       ingressRef:
         kind: Ingress
-        name: ${name}-cjoc
+        path: ${name}-cjoc
+  - name: Initial Admin Password
+    valueFrom:
+      secretRef:
+        kind: Secret
+        name: initialAdminPassword
+        key: password
   descriptor:
     type: CloudBees
     version: '2.121.1.2'
