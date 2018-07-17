@@ -53,6 +53,7 @@ spec:
       labels:
         com.cloudbees.cje.type: cjoc
         com.cloudbees.cje.tenant: cjoc
+        app.kubernetes.io/name: "$name"
     spec:
       serviceAccountName: $cloudBeesCoreServiceAccount
       terminationGracePeriodSeconds: 10
