@@ -92,7 +92,6 @@ spec:
         - containerPort: 50000
         resources:
           limits:
-            cpu: "1"
             memory: "1G"
         volumeMounts:
         - name: jenkins-home
