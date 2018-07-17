@@ -11,6 +11,12 @@ metadata:
   labels:
     app.kubernetes.io/name: "$name"
 spec:
+  info:
+  - name: CloudBees Core Operations Center
+    valueFrom:
+      ingressRef:
+        kind: Ingress
+        name: ${name}-cjoc
   descriptor:
     type: CloudBees
     version: '2.121.1.2'

@@ -21,6 +21,7 @@ properties:
     x-google-marketplace:
       type: IMAGE
   cloudBeesCoreServiceAccount:
+    title: ServiceAccount Name
     type: string
     description: This is the name of the ServiceAccount that is used to deploy CloudBees Core Operations Center and Jenkins Managed Masters.
     x-google-marketplace:
@@ -31,6 +32,7 @@ properties:
           rulesType: PREDEFINED
           rulesFromRoleName: cluster-admin
   ssd:
+    title: SSD Storage Name
     type: string
     description: This is the name of the SSD storage that will be provisioned.
     x-google-marketplace:
