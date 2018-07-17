@@ -80,7 +80,7 @@ spec:
             -Dhudson.lifecycle=hudson.lifecycle.ExitLifecycle
             -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImage=$mmImage
             -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.storageClassName=$ssd
-            -Dcom.cloudbees.jce.masterprovisioning.ContainerMasterProvisioningDescriptor.memory=3072
+            -Dcom.cloudbees.jce.masterprovisioning.ContainerMasterProvisioningDescriptor.memory=0
             -Dcom.cloudbees.jce.masterprovisioning.ContainerMasterProvisioningDescriptor.cpus=0
             -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.serviceAccount=$cloudBeesCoreServiceAccount
         - name: MEM_LIMIT
