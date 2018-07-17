@@ -16,7 +16,6 @@ spec:
     metadata:
       labels:
         app: $name-default-http-backend
-        app.kubernetes.io/name: "$name"
     spec:
       terminationGracePeriodSeconds: 60
       containers:
@@ -96,7 +95,6 @@ spec:
     metadata:
       labels:
         app: $name-ingress-nginx
-        app.kubernetes.io/name: "$name"
       annotations:
         prometheus.io/port: '10254'
         prometheus.io/scrape: 'true'
