@@ -18,39 +18,6 @@ INGRESS_IP=127.0.0.1
 
 set -eox pipefail
 
-# Convenience method to retry a command several times
-retry_command() {
-  local max_attempts=${ATTEMPTS-60}
-  local timeout=${TIMEOUT-1}
-  local attempt=0
-  local exitCode=0
-
-  while (( $attempt < $max_attempts ))
-  do
-    set +e
-    "$@"
-    exitCode=$?
-    set -e
-
-    if [[ $exitCode == 0 ]]
-    then
-      break
-    fi
-
-    echo "$(date -u '+%T') Failure ($exitCode) Retrying in $timeout seconds..." 1>&2
-    sleep $timeout
-    attempt=$(( attempt + 1 ))
-    timeout=$(( timeout ))
-  done
-
-  if [[ $exitCode != 0 ]]
-  then
-    echo "$(date -u '+%T') Failed in the last attempt ($@)" 1>&2
-  fi
-
-  return $exitCode
-}
-
 get_domain_name() {
   echo "$NAME.$INGRESS_IP.xip.io"
 }
@@ -64,9 +31,6 @@ install_cje() {
     # Set domain
     sed -i -e "s#cje.example.com#$(get_domain_name)#" "$install_file"
     kubectl apply -f "$install_file"
-
-    echo "Waiting for CJE to start"
-    TIMEOUT=10 retry_command curl -skSLf -o /dev/null http://$(get_domain_name)/cjoc/login
 }
 
 # Installs ingress controller
