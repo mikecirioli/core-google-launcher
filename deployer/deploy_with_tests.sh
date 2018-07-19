@@ -108,21 +108,23 @@ app_api_version=$(kubectl get "applications/$NAME" \
 
 create_manifests.sh
 
-install_ingress_controller "/data/manifest-ingress-expanded/nginx.yaml"
-
-###cje###
+###ingress controller###
 # Assign owner references for the resources.
 /bin/set_ownership.py \
   --app_name "$NAME" \
   --app_uid "$app_uid" \
   --app_api_version "$app_api_version" \
-  --manifests "/data/manifest-expanded" \
-  --dest "/data/cje.yaml"
+  --manifests "/data/manifest-ingress-expanded" \
+  --dest "/data/nginx.yaml"
 
 # Ensure assembly phase is "Pending", until successful kubectl apply.
 /bin/setassemblyphase.py \
-  --manifest "/data/cje.yaml" \
+  --manifest "/data/nginx.yaml" \
   --status "Pending"
+
+install_ingress_controller "/data/nginx.yaml"
+
+###cje###
 
 #generate a self-signed cert
 create_cert
