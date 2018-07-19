@@ -129,7 +129,7 @@ install_ingress_controller "/data/nginx.yaml"
 #generate a self-signed cert
 create_cert
 
-install_cje "/data/cje.yaml"
+install_cje "/data/manifest-expanded/cje.yaml"
 
 sleep 20
 
