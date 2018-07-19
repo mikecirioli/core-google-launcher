@@ -24,7 +24,7 @@ spec:
         # Any image is permissible as long as:
         # 1. It serves a 404 page at /
         # 2. It serves 200 on a /healthz endpoint
-        image: gcr.io/google_containers/defaultbackend:1.4
+        image: $defaultBackendImage
         livenessProbe:
           httpGet:
             path: /healthz
@@ -107,7 +107,7 @@ spec:
       serviceAccountName: $cloudBeesCoreServiceAccount
       containers:
         - name: $name-nginx-ingress-controller
-          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.16.2
+          image: $nginxIngressImage
           args:
             - /nginx-ingress-controller
             - --default-backend-service=$(POD_NAMESPACE)/$name-default-http-backend
