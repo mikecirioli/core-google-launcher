@@ -78,6 +78,7 @@ spec:
             -Dcom.cloudbees.opscenter.analytics.FeederConfiguration.PERIOD=120
             -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.fsGroup=1000
             -Dhudson.lifecycle=hudson.lifecycle.ExitLifecycle
+            -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.disableAutoConfiguration=true
             -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImage=$mmImage
             -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.storageClassName=$ssd
             -Dcom.cloudbees.jce.masterprovisioning.ContainerMasterProvisioningDescriptor.memory=2048
