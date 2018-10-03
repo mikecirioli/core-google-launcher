@@ -11,13 +11,13 @@ properties:
   cjocImage:
     type: string
     description: This is the CloudBees Core Operations Center image.
-    default: gcr.io/cje-marketplace-dev/cloudbees:2
+    default: gcr.io/cje-marketplace-dev/cloudbees/cloudbees-cloud-core-oc:2
     x-google-marketplace:
       type: IMAGE
   mmImage:
     type: string
     description: This is the Jenkins Managed Master image.
-    default: gcr.io/cje-marketplace-dev/cloudbees/cje-mm:2
+    default: gcr.io/cje-marketplace-dev/cloudbees/cloudbees-core-mm:2
     x-google-marketplace:
       type: IMAGE
   defaultBackendImage:
