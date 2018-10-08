@@ -75,6 +75,12 @@ make app/install
 make app/watch
 ```
 
+### Monitor the CloudBees Core Pods
+
+```shell
+kubectl get pods --namespace=<namespace>
+```
+
 ### Setup Wizard
 Get the CloudBees Core Operations Center URL:
 

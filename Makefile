@@ -20,7 +20,7 @@ include ./marketplace-tools/var.Makefile
 # It requires several APP_* variables defined as followed.
 include ./marketplace-tools/app.Makefile
 
-APP_DEPLOYER_IMAGE ?= $(REGISTRY)/cloudbees/deployer:$(TAG)
+APP_DEPLOYER_IMAGE ?= $(REGISTRY)/cloudbees-core/deployer:$(TAG)
 NAME ?= cloudbees-core-1
 APP_PARAMETERS ?= { \
   "name": "$(NAME)", \
