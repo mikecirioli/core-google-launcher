@@ -115,12 +115,20 @@ The installation configures an xip.io domain. To configure a custom DNS, read [C
 The installation configures a self-signed certificate. To configure your own SSL certificate, read [Ingress TLS Termination](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/ra-for-gke/#_ingress_tls_termination).
 
 ## Additional Resources
-[CloudBees Core Administration Guide](https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/)
+* [CloudBees Core Administration Guide](https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/)
 
-[CloudBees Core Reference Architecture](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/)
+* [CloudBees Core Reference Architecture](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/)
 
-## CloudBees Core Support
-For CloudBees Core support, [visit the CloudBees support page](https://support.cloudbees.com/hc/en-us/requests).
+* [Solution Brief](https://pages.cloudbees.com/l/272242/2018-06-26/9sjwj/272242/54721/cloudbees_core.pdf)
+
+## Licensing
+Request a license by sending an email to info@cloudbees.com or support@cloudbees.com.
+
+## CloudBees Support
+For CloudBees support, [visit the CloudBees support page](https://support.cloudbees.com/hc/en-us/requests).
+
+## Open Source Jenkins Dedicated Support
+[Jenkins Support](https://www.cloudbees.com/products/cloudbees-jenkins-support)
 
 ## Delete the Installation (optional)
 
