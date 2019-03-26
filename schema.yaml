@@ -8,6 +8,11 @@ properties:
     type: string
     x-google-marketplace:
       type: NAMESPACE
+  loadBalancerIp:
+    type: string
+    title: Load Balancer IP (for on-premise only)
+    description: This is only required for on-premise only. For GKE cloud, skip this field and an IP is assigned automatically.
+    pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
   cjocImage:
     type: string
     description: This is the CloudBees Core Operations Center image.

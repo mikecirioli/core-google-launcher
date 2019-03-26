@@ -39,6 +39,7 @@ install_ingress_controller() {
       local source=${1:?}
       local install_file; install_file=$(mktemp)
       cp $source $install_file
+      sed -i '/\$loadBalancerIp/d' "$install_file"
       kubectl apply -f "$install_file"
       echo "Installed ingress controller."
     else
