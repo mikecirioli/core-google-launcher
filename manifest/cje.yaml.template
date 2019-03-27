@@ -166,11 +166,9 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
 spec:
-  # To enable SSL offloading at ingress level, uncomment the following 5 lines
   tls:
   - hosts:
-    - cje.example.com
-    # Name of the secret containing the certificate to be used
+    - $name.$publicHost.xip.io
     secretName: $name-tls
   rules:
   - http:
@@ -179,7 +177,7 @@ spec:
         backend:
           serviceName: cjoc
           servicePort: 80
-    host: cje.example.com
+    host: $name.$publicHost.xip.io
 # Service account for masters
 # from https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/main/kubernetes/service-account.yml
 ---

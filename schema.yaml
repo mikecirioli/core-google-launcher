@@ -8,11 +8,16 @@ properties:
     type: string
     x-google-marketplace:
       type: NAMESPACE
+  publicHost:
+    type: string
+    title: Public host name or IP (ON-PREMISE ONLY)
+    description: This is only required for on-premise only. For cloud GKE, skip this field and this is assigned automatically.
+    pattern: ^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$
   loadBalancerIp:
     type: string
-    title: Load Balancer IP (for on-premise only)
-    description: This is only required for on-premise only. For GKE cloud, skip this field and an IP is assigned automatically.
-    pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+    title: Load balancer IP (ON-PREMISE ONLY)
+    description: This is only required for on-premise only. For cloud GKE, skip this field and this is assigned automatically.
+    pattern: ^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$
   cjocImage:
     type: string
     description: This is the CloudBees Core Operations Center image.
@@ -38,7 +43,7 @@ properties:
     x-google-marketplace:
       type: IMAGE
   cloudBeesCoreServiceAccount:
-    title: ServiceAccount Name
+    title: Service account name
     type: string
     description: This is the name of the ServiceAccount that is used to deploy CloudBees Core Operations Center and Jenkins Managed Masters.
     x-google-marketplace:
@@ -49,7 +54,7 @@ properties:
           rulesType: PREDEFINED
           rulesFromRoleName: cluster-admin
   ssd:
-    title: SSD Storage Name
+    title: SSD storage name
     type: string
     description: This is the name of the SSD storage that will be provisioned.
     x-google-marketplace:

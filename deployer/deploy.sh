@@ -28,8 +28,6 @@ install_cje() {
     local install_file; install_file=$(mktemp)
     cp $source $install_file
     
-    # Set domain
-    sed -i -e "s#cje.example.com#$(get_domain_name)#" "$install_file"
     kubectl apply -f "$install_file"
 }
 
@@ -39,7 +37,6 @@ install_ingress_controller() {
       local source=${1:?}
       local install_file; install_file=$(mktemp)
       cp $source $install_file
-      sed -i '/\$loadBalancerIp/d' "$install_file"
       kubectl apply -f "$install_file"
       echo "Installed ingress controller."
     else
@@ -69,6 +66,23 @@ create_cert(){
   echo "Created server.crt (self-signed)"
 
   kubectl create secret tls $NAME-tls --cert=server.crt --key=server.key
+}
+
+deploy_gke_cloud(){
+  echo "Deploying onto GKE cloud."
+  sed -i '/\$loadBalancerIp/d' "/data/nginx.yaml"
+  install_ingress_controller "/data/nginx.yaml"
+  create_cert
+  sed -i -e "s#\$publicHost#$INGRESS_IP#" "/data/manifest-expanded/cje.yaml"
+  install_cje "/data/manifest-expanded/cje.yaml"
+}
+
+deploy_gke_op(){
+  echo "Deploying onto GKE on-prem."
+  install_ingress_controller "/data/nginx.yaml"
+  sed -i '/tls:/,+3d' "/data/manifest-expanded/cje.yaml"
+  sed -i '/ssl-redirect/d' "/data/manifest-expanded/cje.yaml"
+  install_cje "/data/manifest-expanded/cje.yaml"
 }
 
 # This is the entry point for the production deployment
@@ -123,21 +137,17 @@ create_manifests.sh
   --manifest "/data/nginx.yaml" \
   --status "Pending"
 
-install_ingress_controller "/data/nginx.yaml"
 
-###cje###
-
-#generate a self-signed cert
-create_cert
-
-install_cje "/data/manifest-expanded/cje.yaml"
+if grep -q '$loadBalancerIp' "/data/nginx.yaml" ; then
+  deploy_gke_cloud
+else
+  deploy_gke_op
+fi
 
 sleep 20
 
 patch_assembly_phase.sh --status="Success"
 
 clean_iam_resources.sh
-
-echo "CloudBees Jenkins Enterprise is installed and running at http://$(get_domain_name)/cjoc."
 
 trap - EXIT
