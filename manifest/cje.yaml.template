@@ -32,7 +32,7 @@ metadata:
 data:
   location.groovy: |
     hudson.ExtensionList.lookupSingleton(com.cloudbees.jenkins.support.impl.cloudbees.TcpSlaveAgentListenerMonitor.class).disable(true)
-    jenkins.model.JenkinsLocationConfiguration.get().setUrl("https://cje.example.com/cjoc");
+    jenkins.model.JenkinsLocationConfiguration.get().setUrl("https://$publicHost/cjoc");
 
 ---
 apiVersion: "apps/v1beta1"
@@ -168,7 +168,7 @@ metadata:
 spec:
   tls:
   - hosts:
-    - $name.$publicHost.xip.io
+    - $publicHost
     secretName: $name-tls
   rules:
   - http:
@@ -177,9 +177,7 @@ spec:
         backend:
           serviceName: cjoc
           servicePort: 80
-    host: $name.$publicHost.xip.io
-# Service account for masters
-# from https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/main/kubernetes/service-account.yml
+    host: $publicHost
 ---
 apiVersion: v1
 kind: ConfigMap

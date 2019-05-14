@@ -51,35 +51,8 @@ gcloud container clusters get-credentials <cluster>
 
 ## Installing CloudBees Core on Your Cluster
 
-### Create your Namespace
-```shell
-kubectl create namespace <namespace>
-export NAMESPACE=<namespace>
-```
-
-### One-time CRD Setup
-
-```shell
-make crd/install
-```
-
-### Install CloudBees Core on your Cluster
-
-```shell
-make app/install
-```
-
-### Monitor the Installation
-
-```shell
-make app/watch
-```
-
-### Monitor the CloudBees Core Pods
-
-```shell
-kubectl get pods --namespace=<namespace>
-```
+### Use MPDEV to Install and Test Your Deployer Image
+[MPDEV from Google](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md)
 
 ### Setup Wizard
 Get the CloudBees Core Operations Center URL:

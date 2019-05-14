@@ -38,15 +38,23 @@ install_ingress_controller() {
       local install_file; install_file=$(mktemp)
       cp $source $install_file
       kubectl apply -f "$install_file"
-      echo "Installed ingress controller."
+      echo "Installed ingress controller on gke cloud."
     else
       echo "Ingress controller already exists."
     fi
     
-    
     while [[ "$(kubectl get svc $NAME-ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" = '' ]]; do sleep 3; done
     INGRESS_IP=$(kubectl get svc $NAME-ingress-nginx  -o jsonpath='{.status.loadBalancer.ingress[0].ip}' | sed 's/"//g')
     echo "NGINX INGRESS: $INGRESS_IP"
+}
+
+# Installs ingress controller op
+install_ingress_controller_op() {
+    local source=${1:?}
+    local install_file; install_file=$(mktemp)
+    cp $source $install_file
+    kubectl apply -f "$install_file"
+    echo "Installed ingress controller on gke op."
 }
 
 #create self-signed cert
@@ -73,15 +81,16 @@ deploy_gke_cloud(){
   sed -i '/\$loadBalancerIp/d' "/data/nginx.yaml"
   install_ingress_controller "/data/nginx.yaml"
   create_cert
-  sed -i -e "s#\$publicHost#$INGRESS_IP#" "/data/manifest-expanded/cje.yaml"
+  sed -i -e "s#\$publicHost#$NAME.$INGRESS_IP.xip.io#" "/data/manifest-expanded/cje.yaml"
   install_cje "/data/manifest-expanded/cje.yaml"
 }
 
 deploy_gke_op(){
   echo "Deploying onto GKE on-prem."
-  install_ingress_controller "/data/nginx.yaml"
+  install_ingress_controller_op "/data/nginx.yaml"
   sed -i '/tls:/,+3d' "/data/manifest-expanded/cje.yaml"
   sed -i '/ssl-redirect/d' "/data/manifest-expanded/cje.yaml"
+  sed -i 's/https/http/' "/data/manifest-expanded/cje.yaml"
   install_cje "/data/manifest-expanded/cje.yaml"
 }
 

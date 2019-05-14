@@ -50,7 +50,7 @@ spec:
       Follow the steps in the setup wizard to complete the installation.
 
       #### For GKE On-Premise
-      Go to http://$name.<public host>.xip.io to go to the CloudBees Core Operations Center and start the setup process.
+      Go to http://your-public-host-name to go to the CloudBees Core Operations Center and start the setup process.
 
       The setup process will prompt you for an intial admin password. Execute the following kubectl command to get it. This would be executed from a kubectl client in the same GCP project.
 

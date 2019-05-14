@@ -10,9 +10,9 @@ properties:
       type: NAMESPACE
   publicHost:
     type: string
-    title: Public host name or IP (ON-PREMISE ONLY)
-    description: This is only required for on-premise only. For cloud GKE, skip this field and this is assigned automatically.
-    pattern: ^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$
+    title: Public host name (ON-PREMISE ONLY)
+    description: Must be a valid DNS name. For IP addresses add xip.io. eg. 139.178.70.46.xip.io This is only required for on-premise only. For cloud GKE, skip this field and this is assigned automatically.
+    pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$
   loadBalancerIp:
     type: string
     title: Load balancer IP (ON-PREMISE ONLY)
