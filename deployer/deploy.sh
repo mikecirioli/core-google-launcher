@@ -22,7 +22,7 @@ get_domain_name() {
   echo "$NAME.$INGRESS_IP.xip.io"
 }
 
-# Installs CloudBees Jenkins Enterprise
+# Installs CloudBees Core
 install_cje() {
     local source=${1:?}
     local install_file; install_file=$(mktemp)
