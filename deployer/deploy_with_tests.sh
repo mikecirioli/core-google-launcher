@@ -22,7 +22,7 @@ get_domain_name() {
   echo "$NAME.$INGRESS_IP.xip.io"
 }
 
-# Installs CloudBees Jenkins Enterprise
+# Installs CloudBees Core
 install_cje() {
     local source=${1:?}
     local install_file; install_file=$(mktemp)
@@ -137,6 +137,6 @@ patch_assembly_phase.sh --status="Success"
 
 clean_iam_resources.sh
 
-echo "CloudBees Jenkins Enterprise is installed and running at http://$(get_domain_name)/cjoc."
+echo "CloudBees Core is installed and running at http://$(get_domain_name)/cjoc."
 
 trap - EXIT
