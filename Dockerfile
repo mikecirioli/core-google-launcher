@@ -1,8 +1,8 @@
 FROM gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:latest
 
 # Update apt
-RUN apt-get update
-RUN apt-get upgrade
+RUN apt-get -y update
+RUN apt-get -y upgrade
 
 # Install curl
 RUN apt-get -y install curl

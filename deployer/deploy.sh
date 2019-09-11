@@ -103,10 +103,12 @@ handle_failure() {
   if [[ -z "$NAME" ]] || [[ -z "$NAMESPACE" ]]; then
     # /bin/expand_config.py might have failed.
     # We fall back to the unexpanded params to get the name and namespace.
-    NAME="$(/bin/print_config.py --param '{"x-google-marketplace": {"type": "NAME"}}' \
-            --values_file /data/values.yaml --values_dir /data/values)"
-    NAMESPACE="$(/bin/print_config.py --param '{"x-google-marketplace": {"type": "NAMESPACE"}}' \
-                 --values_file /data/values.yaml --values_dir /data/values)"
+    NAME="$(/bin/print_config.py \
+            --xtype NAME \
+            --values_mode raw)"
+    NAMESPACE="$(/bin/print_config.py \
+            --xtype NAMESPACE \
+            --values_mode raw)"
     export NAME
     export NAMESPACE
   fi
@@ -115,20 +117,26 @@ handle_failure() {
 }
 trap "handle_failure" EXIT
 
-/bin/expand_config.py
-NAME="$(/bin/print_config.py --param '{"x-google-marketplace": {"type": "NAME"}}')"
-NAMESPACE="$(/bin/print_config.py --param '{"x-google-marketplace": {"type": "NAMESPACE"}}')"
+
+NAME="$(/bin/print_config.py \
+    --xtype NAME \
+    --values_mode raw)"
+NAMESPACE="$(/bin/print_config.py \
+    --xtype NAMESPACE \
+    --values_mode raw)"
 export NAME
 export NAMESPACE
 
 echo "Deploying application \"$NAME\""
 
-app_uid=$(kubectl get "applications/$NAME" \
+app_uid=$(kubectl get "applications.app.k8s.io/$NAME" \
   --namespace="$NAMESPACE" \
   --output=jsonpath='{.metadata.uid}')
-app_api_version=$(kubectl get "applications/$NAME" \
+app_api_version=$(kubectl get "applications.app.k8s.io/$NAME" \
   --namespace="$NAMESPACE" \
   --output=jsonpath='{.apiVersion}')
+
+/bin/expand_config.py --values_mode raw --app_uid "$app_uid"
 
 create_manifests.sh
 
