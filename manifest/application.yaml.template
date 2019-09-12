@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/name: "$name"
 spec:
   descriptor:
-    type: CloudBees
+    type: CloudBees Core
     version: '2.138.1.2'
     description: |-
       CloudBees is building the world’s first end-to-end automated software delivery system. We provide smart solutions for continuous development, integration and delivery. By making the software delivery process more productive, manageable and hassle-free, CloudBees puts companies on the fast track to transforming great ideas into great software and delivering value to their business more quickly.
@@ -34,7 +34,7 @@ spec:
       ```
 
       ```shell
-      kubectl get ing -n $namespace | grep cjoc
+      kubectl get ingress -n $namespace | grep cjoc
       ```
       Paste the domain name listed into your browser to go to the CloudBees Core Operations Center and start the setup process.
 
