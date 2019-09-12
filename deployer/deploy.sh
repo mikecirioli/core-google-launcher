@@ -81,17 +81,17 @@ deploy_gke_cloud(){
   sed -i '/\$loadBalancerIp/d' "/data/nginx.yaml"
   install_ingress_controller "/data/nginx.yaml"
   create_cert
-  sed -i -e "s#\$publicHost#$NAME.$INGRESS_IP.xip.io#" "/data/manifest-expanded/cje.yaml"
-  install_cje "/data/manifest-expanded/cje.yaml"
+  sed -i -e "s#\$publicHost#$NAME.$INGRESS_IP.xip.io#" "/data/cje.yaml"
+  install_cje "/data/cje.yaml"
 }
 
 deploy_gke_op(){
   echo "Deploying onto GKE on-prem."
   install_ingress_controller_op "/data/nginx.yaml"
-  sed -i '/tls:/,+3d' "/data/manifest-expanded/cje.yaml"
-  sed -i '/ssl-redirect/d' "/data/manifest-expanded/cje.yaml"
-  sed -i 's/https/http/' "/data/manifest-expanded/cje.yaml"
-  install_cje "/data/manifest-expanded/cje.yaml"
+  sed -i '/tls:/,+3d' "/data/cje.yaml"
+  sed -i '/ssl-redirect/d' "/data/cje.yaml"
+  sed -i 's/https/http/' "/data/cje.yaml"
+  install_cje "/data/cje.yaml"
 }
 
 # This is the entry point for the production deployment
@@ -140,8 +140,14 @@ app_api_version=$(kubectl get "applications.app.k8s.io/$NAME" \
 
 create_manifests.sh
 
-###ingress controller###
 # Assign owner references for the resources.
+/bin/set_ownership.py \
+  --app_name "$NAME" \
+  --app_uid "$app_uid" \
+  --app_api_version "$app_api_version" \
+  --manifests "/data/manifest-expanded" \
+  --dest "/data/cje.yaml"
+
 /bin/set_ownership.py \
   --app_name "$NAME" \
   --app_uid "$app_uid" \
@@ -149,7 +155,12 @@ create_manifests.sh
   --manifests "/data/manifest-ingress-expanded" \
   --dest "/data/nginx.yaml"
 
+
 # Ensure assembly phase is "Pending", until successful kubectl apply.
+/bin/setassemblyphase.py \
+  --manifest "/data/cje.yaml" \
+  --status "Pending"
+
 /bin/setassemblyphase.py \
   --manifest "/data/nginx.yaml" \
   --status "Pending"
