@@ -19,7 +19,7 @@ INGRESS_IP=127.0.0.1
 set -eox pipefail
 
 get_domain_name() {
-  echo "$NAME.$INGRESS_IP.xip.io"
+  echo "$NAME.$INGRESS_IP.beesdns.com"
 }
 
 # Installs CloudBees Core
@@ -73,7 +73,7 @@ deploy_gke_cloud(){
   sed -i '/\$loadBalancerIp/d' "/data/nginx.yaml"
   install_ingress_controller "/data/nginx.yaml"
   create_cert
-  sed -i -e "s#\$publicHost#$NAME.$INGRESS_IP.xip.io#" "/data/cje.yaml"
+  sed -i -e "s#\$publicHost#$NAME.$INGRESS_IP.beesdns.com#" "/data/cje.yaml"
   apply_cloudbees_core_manifest "/data/cje.yaml"
 }
 
