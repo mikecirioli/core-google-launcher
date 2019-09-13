@@ -19,26 +19,21 @@ INGRESS_IP=127.0.0.1
 set -eox pipefail
 
 get_domain_name() {
-  echo "$NAME.$INGRESS_IP.xip.io"
+  echo "$NAME.$INGRESS_IP.beesdns.com"
 }
 
 # Installs CloudBees Core
-install_cje() {
-    local source=${1:?}
-    local install_file; install_file=$(mktemp)
-    cp $source $install_file
-    
-    kubectl apply -f "$install_file"
+apply_cloudbees_core_manifest() {
+    local manifest_file=${1:?} #first arg should be manifest location
+    kubectl apply -f "$manifest_file"
 }
 
 # Installs ingress controller
 install_ingress_controller() {
     if [[ -z $(kubectl get svc | grep $NAME-ingress-nginx ) ]]; then
-      local source=${1:?}
-      local install_file; install_file=$(mktemp)
-      cp $source $install_file
-      kubectl apply -f "$install_file"
-      echo "Installed ingress controller on gke cloud."
+      local manifest_file=${1:?} #first arg should be manifest location
+      kubectl apply -f "$manifest_file"
+      echo "Installed ingress controller."
     else
       echo "Ingress controller already exists."
     fi
@@ -50,29 +45,26 @@ install_ingress_controller() {
 
 # Installs ingress controller op
 install_ingress_controller_op() {
-    local source=${1:?}
-    local install_file; install_file=$(mktemp)
-    cp $source $install_file
-    kubectl apply -f "$install_file"
+    local manifest_file=${1:?} #first arg should be manifest location
+    kubectl apply -f "$manifest_file"
     echo "Installed ingress controller on gke op."
 }
 
 #create self-signed cert
 create_cert(){
-  local source=/data/server.config
-  local config_file; config_file=$(mktemp)
-  cp $source $config_file
+  local config_file=/data/server.config
 
-  sed -i -e "s#cje.example.com#$(get_domain_name)#" "$config_file"
+  #override placeholder domain name with actual domain name
+  sed -i -e "s#cloudbees-core.example.com#$(get_domain_name)#" "$config_file"
 
+  #create self-signed cert
   openssl req -config "$config_file" -new -newkey rsa:2048 -nodes -keyout server.key -out server.csr
-
   echo "Created server.key"
   echo "Created server.csr"
-
   openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
   echo "Created server.crt (self-signed)"
 
+  #create k8s secret which contains cert and key
   kubectl create secret tls $NAME-tls --cert=server.crt --key=server.key
 }
 
@@ -81,8 +73,8 @@ deploy_gke_cloud(){
   sed -i '/\$loadBalancerIp/d' "/data/nginx.yaml"
   install_ingress_controller "/data/nginx.yaml"
   create_cert
-  sed -i -e "s#\$publicHost#$NAME.$INGRESS_IP.xip.io#" "/data/cje.yaml"
-  install_cje "/data/cje.yaml"
+  sed -i -e "s#\$publicHost#$NAME.$INGRESS_IP.beesdns.com#" "/data/cje.yaml"
+  apply_cloudbees_core_manifest "/data/cje.yaml"
 }
 
 deploy_gke_op(){
@@ -91,10 +83,8 @@ deploy_gke_op(){
   sed -i '/tls:/,+3d' "/data/cje.yaml"
   sed -i '/ssl-redirect/d' "/data/cje.yaml"
   sed -i 's/https/http/' "/data/cje.yaml"
-  install_cje "/data/cje.yaml"
+  apply_cloudbees_core_manifest "/data/cje.yaml"
 }
-
-# This is the entry point for the production deployment
 
 # If any command returns with non-zero exit code, set -e will cause the script
 # to exit. Prior to exit, set App assembly status to "Failed".
@@ -115,8 +105,8 @@ handle_failure() {
   patch_assembly_phase.sh --status="Failed"
   exit $code
 }
-trap "handle_failure" EXIT
 
+trap "handle_failure" EXIT
 
 NAME="$(/bin/print_config.py \
     --xtype NAME \
@@ -132,12 +122,15 @@ echo "Deploying application \"$NAME\""
 app_uid=$(kubectl get "applications.app.k8s.io/$NAME" \
   --namespace="$NAMESPACE" \
   --output=jsonpath='{.metadata.uid}')
+echo "App UID: ${app_uid}"
 app_api_version=$(kubectl get "applications.app.k8s.io/$NAME" \
   --namespace="$NAMESPACE" \
   --output=jsonpath='{.apiVersion}')
+echo "App API version: ${app_api_version}"
 
+#set values from schema.yaml as environment variables
 /bin/expand_config.py --values_mode raw --app_uid "$app_uid"
-
+#merge manifests with environment variables
 create_manifests.sh
 
 # Assign owner references for the resources.

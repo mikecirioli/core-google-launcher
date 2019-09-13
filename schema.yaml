@@ -11,7 +11,7 @@ properties:
   publicHost:
     type: string
     title: Public host name (ON-PREMISE ONLY)
-    description: Must be a valid DNS name. For IP addresses add xip.io. eg. 139.178.70.46.xip.io This is only required for on-premise only. For cloud GKE, skip this field and this is assigned automatically.
+    description: Must be a valid DNS name. For IP addresses add beesdns.com. eg. 139.178.70.46.beesdns.com This is only required for on-premise only. For cloud GKE, skip this field and this is assigned automatically.
     pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$
   loadBalancerIp:
     type: string

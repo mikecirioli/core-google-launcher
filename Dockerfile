@@ -24,7 +24,6 @@ RUN git clone https://github.com/cloudbees/core-google-launcher.git
 
 COPY deployer/create_manifests.sh /bin/
 COPY deployer/deploy.sh /bin/
-COPY deployer/deploy_with_tests.sh /bin/
 COPY schema.yaml /data/
 COPY server.config /data/
 COPY manifest /data/manifest

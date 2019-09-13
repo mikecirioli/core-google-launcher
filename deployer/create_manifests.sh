@@ -16,26 +16,10 @@
 
 set -eox pipefail
 
-for i in "$@"
-do
-case $i in
-  --mode=*)
-    mode="${i#*=}"
-    shift
-    ;;
-  *)
-    >&2 echo "Unrecognized flag: $i"
-    exit 1
-    ;;
-esac
-done
-
 [[ -z "$NAME" ]] && echo "NAME must be set" && exit 1
 [[ -z "$NAMESPACE" ]] && echo "NAMESPACE must be set" && exit 1
 
-env_vars="$(/bin/print_config.py -o shell_vars)"
-
-echo "Creating the manifests for the kubernetes resources that build the application \"$NAME\""
+echo "Creating the manifests for the kubernetes resources that install \"$NAME\""
 
 data_dir="/data"
 manifest_dir="$data_dir/manifest-expanded"
@@ -43,25 +27,21 @@ mkdir "$manifest_dir"
 manifest_ingress_dir="$data_dir/manifest-ingress-expanded"
 mkdir "$manifest_ingress_dir"
 
-# Overwrite the templates using the test templates
-if [[ "$mode" = "test" ]]; then
-  if [[ -e "/data-test" ]]; then
-    cp -RT "/data-test" "/data"
-  fi
-fi
+# Store environment variables in local variable
+env_vars="$(/bin/print_config.py -o shell_vars)"
 
-# Replace the environment variables placeholders from the manifest templates
-for manifest_template_file in "$data_dir"/manifest/*; do
-  manifest_file=$(basename "$manifest_template_file" | sed 's/.template$//')
-  cat "$manifest_template_file" \
+# Merge CloudBees Core manifest with environment variables
+for manifest in "$data_dir"/manifest/*; do
+  manifest_file=$(basename "$manifest" | sed 's/.template$//')
+  cat "$manifest" \
     | /bin/config_env.py envsubst "${env_vars}" \
     > "$manifest_dir/$manifest_file"
 done
 
-# Replace the environment variables placeholders from the manifest templates
-for manifest_template_file in "$data_dir"/manifest-ingress/*; do
-  manifest_file=$(basename "$manifest_template_file" | sed 's/.template$//')
-  cat "$manifest_template_file" \
+# Merge Nginx ingress manifest with environment variables
+for manifest in "$data_dir"/manifest-ingress/*; do
+  manifest_file=$(basename "$manifest" | sed 's/.template$//')
+  cat "$manifest" \
     | /bin/config_env.py envsubst "${env_vars}" \
     > "$manifest_ingress_dir/$manifest_file"
 done
