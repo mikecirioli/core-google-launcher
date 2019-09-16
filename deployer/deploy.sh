@@ -148,7 +148,6 @@ create_manifests.sh
   --manifests "/data/manifest-ingress-expanded" \
   --dest "/data/nginx.yaml"
 
-
 # Ensure assembly phase is "Pending", until successful kubectl apply.
 /bin/setassemblyphase.py \
   --manifest "/data/cje.yaml" \
