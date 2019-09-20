@@ -30,16 +30,10 @@ properties:
     default: gcr.io/cje-marketplace-dev/cloudbees-core/cloudbees-core-mm:2.176.3.2
     x-google-marketplace:
       type: IMAGE
-  defaultBackendImage:
-    type: string
-    description: This is an image for the nginx ingress controller.
-    default: gcr.io/cje-marketplace-dev/cloudbees-core/defaultbackend:2
-    x-google-marketplace:
-      type: IMAGE
   nginxIngressImage:
     type: string
     description: This is an image for the nginx ingress controller.
-    default: gcr.io/cje-marketplace-dev/cloudbees-core/nginx-ingress-controller:2
+    default: gcr.io/cje-marketplace-dev/cloudbees-core/nginx-ingress-controller:0.23.0
     x-google-marketplace:
       type: IMAGE
   cloudBeesCoreServiceAccount:

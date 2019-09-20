@@ -1,3 +1,4 @@
+# Source: https://release-notes.cloudbees.com/product/140
 ---
 # Source: cloudbees-core/templates/cjoc-configure-jenkins-groovy.yaml
 apiVersion: v1

@@ -81,3 +81,5 @@ spec:
     kind: Ingress
   - group: apps/v1
     kind: StatefulSet
+  - group: apps/v1
+    kind: Deployment

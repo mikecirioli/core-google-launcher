@@ -38,8 +38,8 @@ install_ingress_controller() {
       echo "Ingress controller already exists."
     fi
     
-    while [[ "$(kubectl get svc $NAME-ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" = '' ]]; do sleep 3; done
-    INGRESS_IP=$(kubectl get svc $NAME-ingress-nginx  -o jsonpath='{.status.loadBalancer.ingress[0].ip}' | sed 's/"//g')
+    while [[ "$(kubectl get svc ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" = '' ]]; do sleep 3; done
+    INGRESS_IP=$(kubectl get svc ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].ip}' | sed 's/"//g')
     echo "NGINX INGRESS: $INGRESS_IP"
 }
 
