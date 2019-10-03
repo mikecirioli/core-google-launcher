@@ -285,6 +285,11 @@ spec:
             initialDelaySeconds: 300
             timeoutSeconds: 5
             failureThreshold: 12
+        - name: reporting-function
+          image: $imageReportingFunction
+          volumeMounts:
+          - name: reporting-function-config
+            mountPath: /etc/reporting-function
         - name: ubbagent
           image: $imageUbbagent
           env:
@@ -312,6 +317,9 @@ spec:
         - name: ubbagent-config
           configMap:
             name: ubbagent-config
+        - name: reporting-function-config
+          configMap:
+            name: reporting-function-config
   volumeClaimTemplates:
     - metadata:
         name: jenkins-home
@@ -328,6 +336,17 @@ spec:
 ---
 # Source: cloudbees-core/templates/route.yaml
 
+#reporting function config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reporting-function-config
+data:
+  config.json: |
+    { "number-of-users": $numberOfUsers}
+
+#ubbagent config
 ---
 apiVersion: v1
 kind: ConfigMap

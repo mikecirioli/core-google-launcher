@@ -167,10 +167,18 @@ properties:
     default: gcr.io/cloud-marketplace-tools/metering/ubbagent:latest
     x-google-marketplace:
       type: IMAGE
+  imageReportingFunction:
+    type: string
+    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/reporting-function:latest
+    x-google-marketplace:
+      type: IMAGE
   reportingSecret:
     type: string
     x-google-marketplace:
       type: REPORTING_SECRET
+  numberOfUsers:
+    title: Number of Users
+    type: string
 required:
 - name
 - namespace
