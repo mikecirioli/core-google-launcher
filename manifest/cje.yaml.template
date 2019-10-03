@@ -390,7 +390,7 @@ spec:
                 -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.fsGroup=1000
                 -Dhudson.lifecycle=hudson.lifecycle.ExitLifecycle
                 -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.disableAutoConfiguration=true
-                -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImageName="CloudBees Core - Managed Master - 2.176.3.2"
+                -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImageName="CloudBees Core - Managed Master - 2.176.4.3"
                 -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImage=$mmImage
                 -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.serviceAccount=jenkins
           ports:
