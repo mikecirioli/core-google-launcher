@@ -7,7 +7,7 @@ metadata:
   name: cjoc-configure-jenkins-groovy
   labels:
     app.kubernetes.io/name: "$name"
-    app.kubernetes.io/component: cjoc-configure-jenkins-groovy
+    app.kubernetes.io/component: cjoc-configure-jenkins-groovy-config-map
     app: cjoc
     chart: "cloudbees-core-3.4.0"
     release: "cloudbees-core"
@@ -24,7 +24,7 @@ metadata:
     name: jenkins-agent
     labels:
         app.kubernetes.io/name: "$name"
-        app.kubernetes.io/component: jenkins-agent
+        app.kubernetes.io/component: jenkins-agent-config-map
         app: cjoc
         chart: "cloudbees-core-3.4.0"
         release: "cloudbees-core"
@@ -150,7 +150,7 @@ metadata:
   name: jenkins
   labels:
     app.kubernetes.io/name: "$name"
-    app.kubernetes.io/component: jenkins
+    app.kubernetes.io/component: jenkins-service-account
     app: cjoc
     chart: "cloudbees-core-3.4.0"
     release: "cloudbees-core"
@@ -164,7 +164,7 @@ metadata:
   name: cjoc-agents
   labels:
     app.kubernetes.io/name: "$name"
-    app.kubernetes.io/component: cjoc-agents
+    app.kubernetes.io/component: cjoc-agents-role
     app: cjoc
     heritage: "Tiller"
     release: "cloudbees-core"
@@ -189,7 +189,7 @@ metadata:
   name: cjoc-master-management
   labels:
     app.kubernetes.io/name: "$name"
-    app.kubernetes.io/component: cjoc-master-management
+    app.kubernetes.io/component: cjoc-master-management-role
 rules:
 - apiGroups: [""]
   resources: ["pods"]
@@ -374,7 +374,7 @@ spec:
             - name: ENVIRONMENT
               value: KUBERNETES
             - name: JENKINS_OPTS
-              value: "--prefix=/cjoc "
+              value: "--prefix=/cjoc"
             - name: JAVA_OPTS
               # To allocate masters using a non-default storage class, add the following
               # -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.storageClassName=some-storage-class
