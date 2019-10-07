@@ -10,9 +10,8 @@ This repository contains the GCP Marketplace deployment resources to launch Clou
 - [docker](https://docs.docker.com/install/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/). You can install
   this tool as part of `gcloud`.
-- [jq](https://github.com/stedolan/jq/wiki/Installation)
 - [make](https://www.gnu.org/software/make/)
-- [watch command](https://en.wikipedia.org/wiki/Watch_(Unix))
+- [mpdev](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md)
 
 ## Set Your GCP Config and Authenticate
 
@@ -24,57 +23,67 @@ gcloud auth login
 ```
 ## Google Container Registry (GCR)
 
-Make files are set up to use Google Container Registry (GCR). Ensure that you GCR enabled for your project. 
+A [Makefile](https://github.com/cloudbees/core-google-launcher/blob/master/Makefile) is included, which uses Google Container Registry (GCR). Ensure that GCR is enabled for your project.
 
 [Enable the GCR API](https://console.cloud.google.com/apis/library/containerregistry.googleapis.com)
 
-## Building the Deployer Image
-Build from the [Dockerfile](https://github.com/cloudbees/core-google-launcher/blob/master/Dockerfile).
+## Publishing CloudBees Core Images
+CloudBees Core images must be published to gcr.io, as they are referenced by the deployer image below.
 
-```shell
-docker build -t deployer:latest .
+First, update the variables in the `Makefile` so that they're specific to your environment, then run `make core` to pull/tag/push CloudBees Core Docker images.
 
-docker tag deployer:latest gcr.io/<path>/deployer:<tag>
-
-docker push gcr.io/<path>/deployer:<tag>
-```
+## Build and publish the Deployer Image
+Build and publish the Deployer [Dockerfile](https://github.com/cloudbees/core-google-launcher/blob/master/Dockerfile) with `make deployer`.
 
 ## Create Your Cluster
+If you are new to GKE, see [Getting Started](https://cloud.google.com/kubernetes-engine/docs/how-to/creating-a-cluster) to create your first cluster.
 
-See [Getting Started](https://cloud.google.com/kubernetes-engine/docs/how-to/creating-a-cluster) to create your cluster. CloudBees Core requires a minimum 3 node cluster with each node having a minimum of 2 vCPU and k8s version 1.8.
-
-Then:
+The following commands create a right-sized GKE cluster and install the [Application](https://github.com/kubernetes-sigs/application) Custom Resource Definition (CRD):
 
 ```shell
-gcloud container clusters get-credentials <cluster> 
+make cluster
+make app-crd
 ```
 
-## Installing CloudBees Core on Your Cluster
+Note: the Application CRD is required to deploy CloudBees Core.
 
-### Use MPDEV to Install and Test Your Deployer Image
-[MPDEV from Google](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md)
+## Install CloudBees Core on Your Cluster
+
+### Use MPDEV to Install and Test the Deployer Image
+Install `mpdev` by using the following [instructions](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md).
+
+To install CloudBees Core using `mpdev`, run `make install`. This command has a "watch" at the end to view the progress of the deployment. Use ctrl+c to stop watching.
+
+To view logs for the deployment:
+
+```shell
+kubectl logs <deployer image>
+
+ex. kubectl logs cloudbees-core-deployer-kqnr7
+```
 
 ### Setup Wizard
 Get the CloudBees Core Operations Center URL:
 
 ```shell
-kubectl get ing -n <namespace> | grep cjoc
+kubectl get ingress -n <namespace> | grep cjoc
 
-ex. kubectl get ing -n deployer-test | grep cjoc
+ex. kubectl get ingress -n cloudbees-core | grep cjoc
 ```
-Paste the domain name listed into your browser to go to the CloudBees Core Operations Center and start the setup process. Or you can click on the cjoc Endpoints link under Kubernetes Engine > Services in the GCP console.
+Paste the domain name listed into your browser to go to the CloudBees Core Operations Center and start the setup process. Or you can click on the Endpoints link under Kubernetes Engine > Services in the GCP console.
 
 The installation process requires an intial admin password. Execute this command to get it:
 
 ```shell
-kubectl exec <app name>-cjoc-0 -n <namespace> -- cat /var/jenkins_home/secrets/initialAdminPassword
+kubectl exec cjoc-0 -n <namespace> -- cat /var/jenkins_home/secrets/initialAdminPassword
 
-ex. kubectl exec cloudbees-core-1-cjoc-0 -n deployer-test -- cat /var/jenkins_home/secrets/initialAdminPassword
+ex. kubectl exec cjoc-0 -n cloudbees-core -- cat /var/jenkins_home/secrets/initialAdminPassword
 ```
 
-You can use the Connect button at Kubernetes Engine > Clusters to launch Cloud Shell to issue this command.
-
 Follow the steps in the setup wizard to complete the installation.
+
+### Uninstall CloudBees Core
+Run `make uninstall` to uninstall CloudBees Core.
 
 ## Using CloudBees Core
 
@@ -85,7 +94,7 @@ To get started using CloudBees Core read our [Getting Started Guide](https://go.
 The installation configures a beesdns.com domain. To configure a custom DNS, read [Creating DNS Record](https://go.cloudbees.com/docs/cloudbees-core/cloud-install-guide/gke-install/#creating-dns-record).
 
 ## HTTPS
-The installation configures a self-signed certificate. To configure your own SSL certificate, read [Ingress TLS Termination](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/ra-for-gke/#_ingress_tls_termination).
+The installation configures a self-signed certificate. To configure your own SSL certificate, refer to [Ingress TLS Termination](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/ra-for-gke/#_ingress_tls_termination).
 
 ## Additional Resources
 * [CloudBees Core Administration Guide](https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/)
@@ -95,22 +104,12 @@ The installation configures a self-signed certificate. To configure your own SSL
 * [Solution Brief](https://pages.cloudbees.com/l/272242/2018-06-26/9sjwj/272242/54721/cloudbees_core.pdf)
 
 ## Licensing
-Request a license by sending an email to info@cloudbees.com or support@cloudbees.com.
+A 15-day free trial license is available via the "Request a Trial" button in the Getting Started wizard, however an Internet connection is required to use this option.
+
+If an offline license is needed, send an email to sales@cloudbees.com.
 
 ## CloudBees Support
-For CloudBees support, [visit the CloudBees support page](https://support.cloudbees.com/hc/en-us/requests).
+To get Support from CloudBees, [visit the CloudBees Support page](https://support.cloudbees.com/hc/en-us/requests).
 
 ## Open Source Jenkins Dedicated Support
 [Jenkins Support](https://www.cloudbees.com/products/cloudbees-jenkins-support)
-
-## Delete the Installation (optional)
-
-```shell
-make app/uninstall
-```
-or
-
-```shell
-kubectl delete application <application> -n <namespace>
-```
-
