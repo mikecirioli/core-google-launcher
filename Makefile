@@ -1,7 +1,8 @@
 #Registries
 CORE_REGISTRY_PATH=cloudbees
 NGINX_REGISTRY_PATH=quay.io/kubernetes-ingress-controller
-GCR_REGISTRY_PATH=gcr.io/cje-marketplace-dev/cloudbees-core
+GCP_PROJECT=cje-marketplace-dev
+GCR_REGISTRY_PATH=gcr.io/$(GCP_PROJECT)/cloudbees-core
 
 #Images
 OC_IMAGE_NAME=cloudbees-cloud-core-oc
@@ -34,18 +35,28 @@ deployer:
 	&& docker push $(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(DEPLOYER_TAG)
 
 # pull/tag/push CloudBees Core images
-core:
-	docker pull $(CORE_REGISTRY_PATH)/$(OC_IMAGE_NAME):$(OC_MM_TAG) \
-	&& docker pull $(CORE_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG) \
-	&& docker pull $(NGINX_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG) \
-	&& docker tag $(CORE_REGISTRY_PATH)/$(OC_IMAGE_NAME):$(OC_MM_TAG) $(GCR_REGISTRY_PATH):$(OC_MM_TAG) \
-	&& docker tag $(CORE_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG) $(GCR_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG) \
-	&& docker tag $(NGINX_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG) $(GCR_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG) \
-	&& docker push $(GCR_REGISTRY_PATH):$(OC_MM_TAG) \
-	&& docker push $(GCR_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG) \
-	&& docker push $(GCR_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG)
+core: core-oc core-mm core-nginx
+
+.PHONY: core-oc
+core-oc:
+	docker pull $(CORE_REGISTRY_PATH)/$(OC_IMAGE_NAME):$(OC_MM_TAG)
+	docker tag $(CORE_REGISTRY_PATH)/$(OC_IMAGE_NAME):$(OC_MM_TAG) $(GCR_REGISTRY_PATH):$(OC_MM_TAG)
+	docker push $(GCR_REGISTRY_PATH):$(OC_MM_TAG)
+
+.PHONY: core-mm
+core-mm:
+	docker pull $(CORE_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG)
+	docker tag $(CORE_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG) $(GCR_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG)
+	docker push $(GCR_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG)
+
+.PHONY: core-nginx
+core-nginx:
+	docker pull $(NGINX_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG)
+	docker tag $(NGINX_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG) $(GCR_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG)
+	docker push $(GCR_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG)
 
 # create a new cluster
+.PHONY: cluster
 cluster:
 	gcloud container clusters create $(CLUSTER_NAME) \
 	--region $(REGION) \
@@ -55,13 +66,14 @@ cluster:
 	--max-nodes 2 
 
 # install kubernetes-sigs/application CRD (required)
-app-crd:
+.PHONY: install-app-crd
+install-app-crd:
 	kubectl apply -f "https://raw.githubusercontent.com/GoogleCloudPlatform/marketplace-k8s-app-tools/master/crd/app-crd.yaml"
 
 # install CloudBees Core using mpdev:
 # https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md
-install:
-	kubectl create ns cloudbees-core \
+install: install-app-crd
+	kubectl create namespace cloudbees-core || true \
 	&& mpdev install --deployer=$(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(DEPLOYER_TAG) \
 	--parameters='{"name": "$(NAME)", "namespace": "$(NAMESPACE)"}' \
 	&& kubectl get po -w

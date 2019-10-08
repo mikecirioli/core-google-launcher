@@ -1,6 +1,6 @@
 # Overview
 
-This repository contains the GCP Marketplace deployment resources to launch CloudBees Core on Google Container Enginer (GKE). 
+This repository contains the GCP Marketplace deployment resources to launch CloudBees Core on Google Container Engine (GKE). 
 
 # Getting Started
 
@@ -42,7 +42,6 @@ The following commands create a right-sized GKE cluster and install the [Applica
 
 ```shell
 make cluster
-make app-crd
 ```
 
 Note: the Application CRD is required to deploy CloudBees Core.
@@ -72,7 +71,7 @@ ex. kubectl get ingress -n cloudbees-core | grep cjoc
 ```
 Paste the domain name listed into your browser to go to the CloudBees Core Operations Center and start the setup process. Or you can click on the Endpoints link under Kubernetes Engine > Services in the GCP console.
 
-The installation process requires an intial admin password. Execute this command to get it:
+The installation process requires an initial admin password. Execute this command to get it:
 
 ```shell
 kubectl exec cjoc-0 -n <namespace> -- cat /var/jenkins_home/secrets/initialAdminPassword
@@ -91,7 +90,7 @@ Run `make uninstall` to uninstall CloudBees Core.
 To get started using CloudBees Core read our [Getting Started Guide](https://go.cloudbees.com/docs/cloudbees-core/cloud-admin-guide/getting-started/#).
 
 ## DNS
-The installation configures a beesdns.com domain. To configure a custom DNS, read [Creating DNS Record](https://go.cloudbees.com/docs/cloudbees-core/cloud-install-guide/gke-install/#creating-dns-record).
+The installation configures a `beesdns.com` domain. To configure a custom DNS, read [Creating DNS Record](https://go.cloudbees.com/docs/cloudbees-core/cloud-install-guide/gke-install/#creating-dns-record).
 
 ## HTTPS
 The installation configures a self-signed certificate. To configure your own SSL certificate, refer to [Ingress TLS Termination](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/ra-for-gke/#_ingress_tls_termination).
