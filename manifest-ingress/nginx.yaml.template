@@ -1,20 +1,9 @@
 # Source: https://github.com/kubernetes/ingress-nginx/blob/master/deploy/static/mandatory.yaml
-
-# apiVersion: v1
-# kind: Namespace
-# metadata:
-#   name: ingress-nginx
-#   labels:
-#     app.kubernetes.io/name: ingress-nginx
-#     app.kubernetes.io/part-of: "$name"
-
 ---
-
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: nginx-configuration
-  namespace: $namespace
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: "$name"
@@ -24,7 +13,6 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: tcp-services
-  namespace: $namespace
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: "$name"
@@ -34,166 +22,15 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: udp-services
-  namespace: $namespace
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: "$name"
 
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: nginx-ingress-serviceaccount
-  namespace: $namespace
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: "$name"
-
----
-# apiVersion: rbac.authorization.k8s.io/v1beta1
-# kind: ClusterRole
-# metadata:
-#   name: nginx-ingress-clusterrole
-#   labels:
-#     app.kubernetes.io/name: ingress-nginx
-#     app.kubernetes.io/part-of: "$name"
-# rules:
-#   - apiGroups:
-#       - ""
-#     resources:
-#       - configmaps
-#       - endpoints
-#       - nodes
-#       - pods
-#       - secrets
-#     verbs:
-#       - list
-#       - watch
-#   - apiGroups:
-#       - ""
-#     resources:
-#       - nodes
-#     verbs:
-#       - get
-#   - apiGroups:
-#       - ""
-#     resources:
-#       - services
-#     verbs:
-#       - get
-#       - list
-#       - watch
-#   - apiGroups:
-#       - ""
-#     resources:
-#       - events
-#     verbs:
-#       - create
-#       - patch
-#   - apiGroups:
-#       - "extensions"
-#       - "networking.k8s.io"
-#     resources:
-#       - ingresses
-#     verbs:
-#       - get
-#       - list
-#       - watch
-#   - apiGroups:
-#       - "extensions"
-#       - "networking.k8s.io"
-#     resources:
-#       - ingresses/status
-#     verbs:
-#       - update
-
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: Role
-metadata:
-  name: nginx-ingress-role
-  namespace: $namespace
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: "$name"
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-      - pods
-      - secrets
-      - namespaces
-    verbs:
-      - get
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    resourceNames:
-      # Defaults to "<election-id>-<ingress-class>"
-      # Here: "<ingress-controller-leader>-<nginx>"
-      # This has to be adapted if you change either parameter
-      # when launching the nginx-ingress-controller.
-      - "ingress-controller-leader-nginx"
-    verbs:
-      - get
-      - update
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    verbs:
-      - create
-  - apiGroups:
-      - ""
-    resources:
-      - endpoints
-    verbs:
-      - get
-
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: RoleBinding
-metadata:
-  name: nginx-ingress-role-nisa-binding
-  namespace: $namespace
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: "$name"
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: nginx-ingress-role
-subjects:
-  - kind: ServiceAccount
-    name: nginx-ingress-serviceaccount
-    namespace: $namespace
-
----
-# apiVersion: rbac.authorization.k8s.io/v1beta1
-# kind: ClusterRoleBinding
-# metadata:
-#   name: nginx-ingress-clusterrole-nisa-binding
-#   labels:
-#     app.kubernetes.io/name: ingress-nginx
-#     app.kubernetes.io/part-of: "$name"
-# roleRef:
-#   apiGroup: rbac.authorization.k8s.io
-#   kind: ClusterRole
-#   name: nginx-ingress-clusterrole
-# subjects:
-#   - kind: ServiceAccount
-#     name: nginx-ingress-serviceaccount
-#     namespace: ingress-nginx
-
----
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-ingress-controller
-  namespace: $namespace
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: "$name"
@@ -212,7 +49,7 @@ spec:
         prometheus.io/port: "10254"
         prometheus.io/scrape: "true"
     spec:
-      serviceAccountName: $cloudBeesCoreServiceAccount #nginx-ingress-serviceaccount
+      serviceAccountName: $nginxIngressServiceAccount
       containers:
         - name: nginx-ingress-controller
           image: $nginxIngressImage
@@ -268,14 +105,11 @@ spec:
             timeoutSeconds: 10
 
 ---
-
 # Source: https://github.com/kubernetes/ingress-nginx/blob/master/deploy/static/provider/cloud-generic.yaml
-
 kind: Service
 apiVersion: v1
 metadata:
   name: ingress-nginx
-  namespace: $namespace
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: "$name"
@@ -293,5 +127,3 @@ spec:
     - name: https
       port: 443
       targetPort: https
-
----

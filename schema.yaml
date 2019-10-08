@@ -36,17 +36,124 @@ properties:
     default: gcr.io/cje-marketplace-dev/cloudbees-core/nginx-ingress-controller:0.23.0
     x-google-marketplace:
       type: IMAGE
-  cloudBeesCoreServiceAccount:
-    title: Service account name
+  nginxIngressServiceAccount:
+    title: NGINX Ingress Service account name
     type: string
-    description: This is the name of the ServiceAccount that is used to deploy CloudBees Core Operations Center and Jenkins Managed Masters.
+    description: This is the name of the ServiceAccount that is used to deploy the NGINX Ingress Controller.
     x-google-marketplace:
       type: SERVICE_ACCOUNT
       serviceAccount:
         roles:
-        - type: ClusterRole
-          rulesType: PREDEFINED
-          rulesFromRoleName: cluster-admin
+          - type: Role
+            rulesType: CUSTOM
+            rules:
+              - apiGroups: [""]
+                resources: ["namespaces"]
+                verbs: ["get"]
+              - apiGroups: [""]
+                resources: ["configmaps", "pods", "secrets", "endpoints"]
+                verbs: ["get", "list", "watch"]
+              - apiGroups: [""]
+                resources: ["services"]
+                verbs: ["get", "list", "update", "watch"]
+              - apiGroups: ["extensions"]
+                resources: ["ingresses"]
+                verbs: ["get", "list", "watch"]
+              - apiGroups: ["extensions"]
+                resources: ["ingresses/status"]
+                verbs: ["update"]
+              - apiGroups: [""]
+                resourceNames: ["ingress-controller-leader-nginx"]
+                resources: ["configmaps"]
+                verbs: ["get", "update"]
+              - apiGroups: [""]
+                resources: ["configmaps"]
+                verbs: ["create"]
+              - apiGroups: [""]
+                resources: ["endpoints"]
+                verbs: ["create", "get", "update"]
+              - apiGroups: [""]
+                resources: ["events"]
+                verbs: ["create", "patch"]
+          - type: ClusterRole
+            rulesType: CUSTOM
+            rules:
+              - apiGroups: [""]
+                resources: ["configmaps", "endpoints", "nodes", "pods", "secrets"]
+                verbs: ["list", "watch"]
+              - apiGroups: [""]
+                resources: ["nodes"]
+                verbs: ["get"]
+              - apiGroups: [""]
+                resources: ["services"]
+                verbs: ["get", "list", "watch"]
+              - apiGroups: [""]
+                resources: ["events"]
+                verbs: ["create", "update"]
+              - apiGroups: ["extensions", "networking.k8s.io"]
+                resources: ["ingresses"]
+                verbs: ["get", "list", "watch"]
+              - apiGroups: ["extensions", "networking.k8s.io"]
+                resources: ["ingresses/status"]
+                verbs: ["update"]
+  operationsCenterServiceAccount:
+    title: Operations Center Service account name
+    type: string
+    description: This is the name of the ServiceAccount that is used to deploy CloudBees Core Operations Center.
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+        - type: Role
+          rulesType: CUSTOM
+          rules:
+            - apiGroups: [""]
+              resources: ["pods"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: [""]
+              resources: ["pods/exec"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: [""]
+              resources: ["pods/log"]
+              verbs: ["get","list","watch"]
+            - apiGroups: ["apps"]
+              resources: ["statefulsets"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: [""]
+              resources: ["services"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: [""]
+              resources: ["persistentvolumeclaims"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: ["extensions"]
+              resources: ["ingresses"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: [""]
+              resources: ["secrets"]
+              verbs: ["list"]
+            - apiGroups: [""]
+              resources: ["events"]
+              verbs: ["get","list","watch"]
+  masterServiceAccount:
+    title: Managed Master Service account name
+    type: string
+    description: This is the name of the ServiceAccount that is used to deploy CloudBees Core Managed Masters.
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+          - type: Role
+            rulesType: CUSTOM
+            rules:
+              - apiGroups: [""]
+                resources: ["pods"]
+                verbs: ["create","delete","get","list","patch","update","watch"]
+              - apiGroups: [""]
+                resources: ["pods/exec"]
+                verbs: ["create","delete","get","list","patch","update","watch"]
+              - apiGroups: [""]
+                resources: ["pods/log"]
+                verbs: ["get","list","watch"]
   ssd:
     title: SSD storage name
     type: string
@@ -60,5 +167,7 @@ required:
 - namespace
 - cjocImage
 - mmImage
-- cloudBeesCoreServiceAccount
+- nginxIngressServiceAccount
+- operationsCenterServiceAccount
+- masterServiceAccount
 - ssd
