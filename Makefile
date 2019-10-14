@@ -2,7 +2,7 @@
 CORE_REGISTRY_PATH=cloudbees
 NGINX_REGISTRY_PATH=quay.io/kubernetes-ingress-controller
 GCP_PROJECT=cje-marketplace-dev
-GCR_REGISTRY_PATH=gcr.io/$(GCP_PROJECT)/cloudbees-core
+GCR_REGISTRY_PATH=gcr.io/$(GCP_PROJECT)/cloudbees-core-billable
 
 #Images
 OC_IMAGE_NAME=cloudbees-cloud-core-oc
@@ -19,6 +19,7 @@ DEPLOYER_TAG=latest
 #Deployer params
 NAME=cloudbees-core
 NAMESPACE=cloudbees-core
+NUMBER_OF_USERS=10
 
 #New cluster params
 CLUSTER_NAME=cloudbees-core-marketplace
@@ -79,7 +80,7 @@ install-app-crd:
 install: install-app-crd
 	kubectl create namespace cloudbees-core || true \
 	&& mpdev install --deployer=$(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(DEPLOYER_TAG) \
-	--parameters='{"name": "$(NAME)", "namespace": "$(NAMESPACE)"}' \
+	--parameters='{"name": "$(NAME)", "namespace": "$(NAMESPACE)", "numberOfUsers": "$(NUMBER_OF_USERS)"}' \
 	&& kubectl get po -w
 
 uninstall:

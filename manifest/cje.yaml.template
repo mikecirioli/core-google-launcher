@@ -333,8 +333,6 @@ spec:
         resources:
           requests:
             storage: "20Gi"
----
-# Source: cloudbees-core/templates/route.yaml
 
 #reporting function config
 ---
@@ -367,7 +365,7 @@ data:
     # Metric names should match verbatim the identifiers created
     # during pricing setup.
     metrics:
-    - name: requests
+    - name: user
       type: int
 
       # The endpoints section of a metric defines which endpoints the
@@ -412,9 +410,8 @@ data:
         identity: gcp
         # The service name is unique to your application and will be
         # provided during onboarding.
-        serviceName: my-application.mp-my-company.appspot.com
+        serviceName: cloudbees-core-billable.mp-cloudbees.appspot.com
         consumerId: $AGENT_CONSUMER_ID  # From the reporting secret.
-
 
     # The sources section lists metric data sources run by the agent
     # itself. The currently-supported source is 'heartbeat', which

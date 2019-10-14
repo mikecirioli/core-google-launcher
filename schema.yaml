@@ -176,9 +176,11 @@ properties:
     type: string
     x-google-marketplace:
       type: REPORTING_SECRET
-  numberOfUsers:
+  numberOfUsers: # use INT https://github.com/GoogleCloudPlatform/click-to-deploy/blob/master/k8s/cassandra/schema.yaml#L16-L22
     title: Number of Users
-    type: string
+    type: integer
+    default: 10
+    minimum: 10
 required:
 - name
 - namespace
