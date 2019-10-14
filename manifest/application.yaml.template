@@ -13,7 +13,7 @@ metadata:
 spec:
   descriptor:
     type: CloudBees Core
-    version: '2.138.1.2'
+    version: '2.176.4.3'
     description: |-
       CloudBees is building the world’s first end-to-end automated software delivery system. We provide smart solutions for continuous development, integration and delivery. By making the software delivery process more productive, manageable and hassle-free, CloudBees puts companies on the fast track to transforming great ideas into great software and delivering value to their business more quickly.
     links:
@@ -43,7 +43,7 @@ spec:
       The setup process will prompt you for an intial admin password. Execute this command to get it:
 
       ```shell
-      kubectl exec $name-cjoc-0 -n $namespace -- cat /var/jenkins_home/secrets/initialAdminPassword
+      kubectl exec cjoc-0 -n $namespace -- cat /var/jenkins_home/secrets/initialAdminPassword
       ```
       You can use the Connect button at Kubernetes Engine > Clusters to launch Cloud Shell to issue this command.
 
@@ -55,7 +55,7 @@ spec:
       The setup process will prompt you for an intial admin password. Execute the following kubectl command to get it. This would be executed from a kubectl client in the same GCP project.
 
       ```shell
-      kubectl exec $name-cjoc-0 -n $namespace -- cat /var/jenkins_home/secrets/initialAdminPassword
+      kubectl exec cjoc-0 -n $namespace -- cat /var/jenkins_home/secrets/initialAdminPassword
       ```
       
       ## Using CloudBees Core
@@ -69,9 +69,17 @@ spec:
   componentKinds:
   - group: v1
     kind: ConfigMap
-  - group: v1beta1
-    kind: StatefulSet
+  - group: v1
+    kind: ServiceAccount
+  - group: rbac.authorization.k8s.io/v1
+    kind: Role
+  - group: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
   - group: v1
     kind: Service
-  - group: v1
+  - group: extensions/v1beta1
     kind: Ingress
+  - group: apps/v1
+    kind: StatefulSet
+  - group: apps/v1
+    kind: Deployment

@@ -1,126 +1,72 @@
+# Source: https://github.com/kubernetes/ingress-nginx/blob/master/deploy/static/mandatory.yaml
 ---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-configuration
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: "$name"
 
-apiVersion: extensions/v1beta1
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: tcp-services
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: "$name"
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: udp-services
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: "$name"
+
+---
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: $name-default-http-backend
+  name: nginx-ingress-controller
   labels:
-    app: $name-default-http-backend
-    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: "$name"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: $name-default-http-backend
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/part-of: "$name"
   template:
     metadata:
       labels:
-        app: $name-default-http-backend
-        app.kubernetes.io/name: "$name"
-    spec:
-      terminationGracePeriodSeconds: 60
-      containers:
-      - name: $name-default-http-backend
-        # Any image is permissible as long as:
-        # 1. It serves a 404 page at /
-        # 2. It serves 200 on a /healthz endpoint
-        image: $defaultBackendImage
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
-        ports:
-        - containerPort: 8080
-        resources:
-          limits:
-            cpu: 10m
-            memory: 20Mi
-          requests:
-            cpu: 10m
-            memory: 20Mi
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: $name-default-http-backend
-  labels:
-    app: $name-default-http-backend
-    app.kubernetes.io/name: "$name"
-spec:
-  ports:
-  - port: 80
-    targetPort: 8080
-  selector:
-    app: $name-default-http-backend
----
-
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: $name-nginx-configuration
-  labels:
-    app: $name-ingress-nginx
-    app.kubernetes.io/name: "$name"
----
-
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: $name-tcp-services
-  labels:
-    app.kubernetes.io/name: "$name"
----
-
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: $name-udp-services
-  labels:
-    app.kubernetes.io/name: "$name"
-
----
-
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: $name-nginx-ingress-controller
-  labels:
-    app.kubernetes.io/name: "$name"
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: $name-ingress-nginx
-  template:
-    metadata:
-      labels:
-        app: $name-ingress-nginx
-        app.kubernetes.io/name: "$name"
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: "$name"
       annotations:
-        prometheus.io/port: '10254'
-        prometheus.io/scrape: 'true'
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
     spec:
-      serviceAccountName: $cloudBeesCoreServiceAccount
+      serviceAccountName: $nginxIngressServiceAccount
       containers:
-        - name: $name-nginx-ingress-controller
+        - name: nginx-ingress-controller
           image: $nginxIngressImage
           args:
             - /nginx-ingress-controller
-            - --default-backend-service=$(POD_NAMESPACE)/$name-default-http-backend
-            - --configmap=$(POD_NAMESPACE)/$name-nginx-configuration
-            - --tcp-services-configmap=$(POD_NAMESPACE)/$name-tcp-services
-            - --udp-services-configmap=$(POD_NAMESPACE)/$name-udp-services
-            - --publish-service=$(POD_NAMESPACE)/$name-ingress-nginx
+            - --configmap=$(POD_NAMESPACE)/nginx-configuration
+            - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
+            - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
+            - --publish-service=$(POD_NAMESPACE)/ingress-nginx
             - --annotations-prefix=nginx.ingress.kubernetes.io
+            - --watch-namespace=$(POD_NAMESPACE)
           securityContext:
+            allowPrivilegeEscalation: true
             capabilities:
-                drop:
+              drop:
                 - ALL
-                add:
+              add:
                 - NET_BIND_SERVICE
             # www-data -> 33
             runAsUser: 33
@@ -134,10 +80,10 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
           ports:
-          - name: http
-            containerPort: 80
-          - name: https
-            containerPort: 443
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -147,7 +93,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 10
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -156,27 +102,28 @@ spec:
               scheme: HTTP
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
-            
----
+            timeoutSeconds: 10
 
+---
+# Source: https://github.com/kubernetes/ingress-nginx/blob/master/deploy/static/provider/cloud-generic.yaml
 kind: Service
 apiVersion: v1
 metadata:
-  name: $name-ingress-nginx
+  name: ingress-nginx
   labels:
-    app: $name-ingress-nginx
-    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: "$name"
 spec:
   externalTrafficPolicy: Local
   type: LoadBalancer
   loadBalancerIP: $loadBalancerIp
   selector:
-    app: $name-ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: "$name"
   ports:
-  - name: http
-    port: 80
-    targetPort: http
-  - name: https
-    port: 443
-    targetPort: https
+    - name: http
+      port: 80
+      targetPort: http
+    - name: https
+      port: 443
+      targetPort: https
