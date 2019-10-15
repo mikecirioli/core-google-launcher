@@ -72,6 +72,10 @@ install-app-crd:
 
 # install CloudBees Core using mpdev:
 # https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md
+# NOTE: the `kubectl` command at the end "watches" pods, and will appear frozen
+# if `kubectl` is not using the `cloudbees-core` namespace.
+# Use `kubens` to switch your namespace: https://github.com/ahmetb/kubectx
+# Use ctrl+C to stop watching pods and do other things.
 install: install-app-crd
 	kubectl create namespace cloudbees-core || true \
 	&& mpdev install --deployer=$(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(DEPLOYER_TAG) \
