@@ -17,6 +17,117 @@ data:
     hudson.ExtensionList.lookupSingleton(com.cloudbees.jenkins.support.impl.cloudbees.TcpSlaveAgentListenerMonitor.class).disable(true)
     jenkins.model.JenkinsLocationConfiguration.get().setUrl("https://$publicHost/cjoc");
 ---
+#registration-detail.json
+# Source: other crap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cjoc-registration-detail-json
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: cjoc-registration-detail-json-config-map
+    app: cjoc
+    chart: "cloudbees-core-3.4.0"
+    release: "cloudbees-core"
+    heritage: "Tiller"
+data:
+  registration-detail.json: |
+    {
+      "firstname": "$customerFirstName",
+      "lastname": "$customerLastName",
+      "email": "$customerEmail",
+      "company": "$customerCompany"
+    }
+---
+# Source: crap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cjoc-install-license-groovy
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: cjoc-install-license-groovy-config-map
+    app: cjoc
+    chart: "cloudbees-core-3.4.0"
+    release: "cloudbees-core"
+    heritage: "Tiller"
+data:
+  init.groovy: |
+    import com.cloudbees.opscenter.server.license.OperationsCenterEvaluationRegistrar;
+
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.nio.file.Paths;
+    import java.util.List;
+    import java.util.concurrent.ExecutionException;
+    import java.util.logging.Logger;
+    import java.util.stream.Collectors;
+    import javax.servlet.ServletException;
+
+    import net.sf.json.JSONObject;
+
+    import hudson.license.LicenseManager;
+
+    import jenkins.plugins.asynchttpclient.AHC;
+
+    import com.cloudbees.jenkins.plugins.license.JenkinsHelper;
+    import com.cloudbees.jenkins.plugins.license.nectar.EvaluationRegistrar;
+
+    import groovy.transform.Field;
+
+    //Field = Global scope
+    @Field Logger LOGGER = Logger.getLogger("com.cloudbees.groovy");
+    LOGGER.info("MY CUSTOM GROOVY IS UP");
+
+    main();
+
+    //All code is in methods, so no surprises with lonely lines somewhere.
+    def main() {
+
+        if (LicenseManager.getConfigFile().exists()) {
+            LOGGER.info("LICENSE EXISTS");
+
+        } else {
+            LOGGER.info("LICENSE NOT THERE, request for a Trial one.");
+            JSONObject json = getRegistrationJSONObject();
+
+            if(json != null){
+
+                String company = json.get("company").toString();
+                String email = json.get("email").toString();
+                String firstname = json.get("firstname").toString();
+                String lastname = json.get("lastname").toString();
+                String productCode = OperationsCenterEvaluationRegistrar.EVAL_EDITION_MULTI_MASTER_SOURCE_TRIAL;
+
+                requestTrialLicenseWithWizardCode(firstname,lastname,email,company,productCode,false,true);
+            } else {
+                LOGGER.info("WARNING:registration-detail.json Not Found.");
+            }
+            
+        }
+
+    }
+
+    //Use the same classes as the one used by the wizard to get the Trial
+    def requestTrialLicenseWithWizardCode(firstname,lastname,email,company,productCode,subscribe,agree) { 
+        EvaluationRegistrar registrar = new OperationsCenterEvaluationRegistrar(null, null, null, null, true, false, null);
+        registrar.register(firstname,lastname,email,company,subscribe,agree,productCode);
+    }
+
+    //Read customer data from JENKINS_HOME/registration-detail.json
+    def getRegistrationJSONObject() {
+        String jenkinsHome = JenkinsHelper.getInstance().getRootDir().toString();
+        Path registrationFilePath = Paths.get(jenkinsHome, "registration-detail.json");
+
+        if(registrationFilePath.toFile().exists()) {
+            List<String> lines = Files.readAllLines(registrationFilePath);
+            String fullJson = lines.stream().collect(Collectors.joining());
+            return JSONObject.fromObject(fullJson);
+        } else {
+            return null;
+        }
+    }
+---
 # Source: cloudbees-core/templates/cjoc-jenkins-agent.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -278,6 +389,14 @@ spec:
             - name: jenkins-configure-jenkins-groovy
               mountPath: /var/jenkins_config/configure-jenkins.groovy.d
               readOnly: true
+            - name: jenkins-registration-detail-json
+              mountPath: /var/jenkins_home/registration-detail.json
+              subPath: registration-detail.json
+              readOnly: true
+            - name: jenkins-install-license-groovy
+              mountPath: /var/jenkins_home/init.groovy
+              subPath: init.groovy
+              readOnly: true
           livenessProbe:
             httpGet:
               path: /cjoc/login
@@ -320,6 +439,12 @@ spec:
         - name: reporting-function-config
           configMap:
             name: reporting-function-config
+        - name: jenkins-registration-detail-json
+          configMap:
+            name:  cjoc-registration-detail-json
+        - name: jenkins-install-license-groovy
+          configMap:
+            name:  cjoc-install-license-groovy
   volumeClaimTemplates:
     - metadata:
         name: jenkins-home
