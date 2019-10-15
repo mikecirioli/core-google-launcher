@@ -39,6 +39,23 @@ data:
       "company": "$customerCompany"
     }
 ---
+#.cloudbees-referrer.txt
+# Source: even more other crap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cjoc-cloudbees-referrer-txt
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: cjoc-cloudbees-referrer-txt-config-map
+    app: cjoc
+    chart: "cloudbees-core-3.4.0"
+    release: "cloudbees-core"
+    heritage: "Tiller"
+data:
+  .cloudbees-referrer.txt: |
+    Core on Google Marketplace
+---
 # Source: crap
 apiVersion: v1
 kind: ConfigMap
@@ -393,6 +410,10 @@ spec:
               mountPath: /var/jenkins_home/registration-detail.json
               subPath: registration-detail.json
               readOnly: true
+            - name: jenkins-cloudbees-referrer-txt
+              mountPath: /var/jenkins_home/.cloudbees-referrer.txt
+              subPath: .cloudbees-referrer.txt
+              readOnly: true
             - name: jenkins-install-license-groovy
               mountPath: /var/jenkins_home/init.groovy
               subPath: init.groovy
@@ -442,6 +463,9 @@ spec:
         - name: jenkins-registration-detail-json
           configMap:
             name:  cjoc-registration-detail-json
+        - name: jenkins-cloudbees-referrer-txt
+          configMap:
+            name:  cjoc-cloudbees-referrer-txt
         - name: jenkins-install-license-groovy
           configMap:
             name:  cjoc-install-license-groovy
