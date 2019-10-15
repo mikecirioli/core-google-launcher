@@ -181,6 +181,18 @@ properties:
     type: integer
     default: 10
     minimum: 10
+  customerFirstName:
+    title: Customers first name (for licensing)
+    type: string
+  customerLastName:
+    title: Customers last name (for licensing)
+    type: string
+  customerEmail:
+    title: Customers email address (for licensing)
+    type: string
+  customerCompany:
+    title: Customers company name (for licensing)
+    type: string
 required:
 - name
 - namespace
@@ -190,3 +202,8 @@ required:
 - operationsCenterServiceAccount
 - masterServiceAccount
 - ssd
+- numberOfUsers
+- customerFirstName
+- customerLastName
+- customerEmail
+- customerCompany
