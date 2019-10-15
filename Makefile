@@ -1,8 +1,8 @@
 #Registries
 CORE_REGISTRY_PATH=cloudbees
 NGINX_REGISTRY_PATH=quay.io/kubernetes-ingress-controller
-GCP_PROJECT=mikec-marketplace-dev
-GCR_REGISTRY_PATH=gcr.io/$(GCP_PROJECT)/cloudbees-core
+GCP_PROJECT=cje-marketplace-dev
+GCR_REGISTRY_PATH=gcr.io/$(GCP_PROJECT)/cloudbees-core-billable
 
 #Images
 OC_IMAGE_NAME=cloudbees-cloud-core-oc
