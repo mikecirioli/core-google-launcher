@@ -48,6 +48,13 @@ Note: the Application CRD is required to deploy CloudBees Core.
 
 ## Install CloudBees Core on Your Cluster
 
+### Set required licensing paramters
+The following environment variables need to be set (or passed to `make`):
+- CUSTOMER_FIRST_NAME  -  _Your first name_
+- CUSTOMER_LAST_NAME  -  _Your last name_
+- CUSTOMER_EMAIL  -  _Your email address_
+- CUSTOMER_COMPANY  -  _Your company name_
+
 ### Use MPDEV to Install and Test the Deployer Image
 Install `mpdev` by using the following [instructions](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md).
 
