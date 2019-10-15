@@ -1,8 +1,8 @@
 #Registries
 CORE_REGISTRY_PATH=cloudbees
 NGINX_REGISTRY_PATH=quay.io/kubernetes-ingress-controller
-GCP_PROJECT=cje-marketplace-dev
-GCR_REGISTRY_PATH=gcr.io/$(GCP_PROJECT)/cloudbees-core-billable
+GCP_PROJECT=mikec-marketplace-dev
+GCR_REGISTRY_PATH=gcr.io/$(GCP_PROJECT)/cloudbees-core
 
 #Images
 OC_IMAGE_NAME=cloudbees-cloud-core-oc
@@ -27,6 +27,14 @@ REGION=us-east4
 
 # pull/tag/push Core images, build/tag/push Deployer image
 all: core deployer
+
+# These parameters are required for CJOC licensing
+.PHONY: check-license-params
+check-license-params:
+	@test -n "$(CUSTOMER_FIRST_NAME)" || (echo 'CUSTOMER_FIRST_NAME must be set' && exit 1)
+	@test -n "$(CUSTOMER_LAST_NAME)" || (echo 'CUSTOMER_LAST_NAME must be set' && exit 1)
+	@test -n "$(CUSTOMER_EMAIL)" || (echo 'CUSTOMER_EMAIL must be set' && exit 1)
+	@test -n "$(CUSTOMER_COMPANY)" || (echo 'CUSTOMER_COMPANY must be set' && exit 1)
 
 # build/tag/push Deployer image
 .PHONY: deployer
@@ -73,14 +81,12 @@ install-app-crd:
 
 # install CloudBees Core using mpdev:
 # https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md
-# NOTE: the `kubectl` command at the end "watches" pods, and will appear frozen
-# if `kubectl` is not using the `cloudbees-core` namespace.
-# Use `kubens` to switch your namespace: https://github.com/ahmetb/kubectx
-# Use ctrl+C to stop watching pods and do other things.
-install: install-app-crd
+install: install-app-crd check-license-params
 	kubectl create namespace cloudbees-core || true \
 	&& mpdev install --deployer=$(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(DEPLOYER_TAG) \
-	--parameters='{"name": "$(NAME)", "namespace": "$(NAMESPACE)", "numberOfUsers": "$(NUMBER_OF_USERS)"}' \
+	--parameters='{"name": "$(NAME)", "namespace": "$(NAMESPACE)", "numberOfUsers": "$(NUMBER_OF_USERS)", \
+	"customerFirstName": "$(CUSTOMER_FIRST_NAME)", "customerLastName": "$(CUSTOMER_LAST_NAME)", \
+	"customerEmail": "$(CUSTOMER_EMAIL)", "customerCompany": "$(CUSTOMER_COMPANY)"}' \
 	&& kubectl get po -w
 
 uninstall:
