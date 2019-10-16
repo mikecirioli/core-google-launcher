@@ -27,10 +27,18 @@ A [Makefile](https://github.com/cloudbees/core-google-launcher/blob/master/Makef
 
 [Enable the GCR API](https://console.cloud.google.com/apis/library/containerregistry.googleapis.com)
 
+The `Makefile` references GCR by project name. Set an environment variable for your GCP project:
+
+`export GCP_PROJECT=my-gcp-project`
+
 ## Publishing CloudBees Core Images
 CloudBees Core images must be published to gcr.io, as they are referenced by the deployer image below.
 
-First, update the variables in the `Makefile` so that they're specific to your environment, then run `make core` to pull/tag/push CloudBees Core Docker images.
+Run `make core` to pull/tag/push CloudBees Core Docker images.
+
+## Publishing Marketplace-specific Images
+
+Run `make ubbagent` to publish Google's Usage-based billing agent ("ubbagent").
 
 ## Build and publish the Deployer Image
 Build and publish the Deployer [Dockerfile](https://github.com/cloudbees/core-google-launcher/blob/master/Dockerfile) with `make deployer`.
@@ -58,14 +66,18 @@ The following environment variables need to be set (or passed to `make`):
 ### Use MPDEV to Install and Test the Deployer Image
 Install `mpdev` by using the following [instructions](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md).
 
-To install CloudBees Core using `mpdev`, run `make install`. This command has a "watch" at the end to view the progress of the deployment. Use ctrl+c to stop watching.
+To install CloudBees Core using `mpdev`, run `make install`.
+
+Watch the installation proceed using `kubectl get po -w -n cloudbees-core`.
+
+The installation is complete when the status of the deployer image is `Completed`, but pay attention to the status of the other pods. The deployer running to completion doesn't always mean the install was successful.
 
 To view logs for the deployment:
 
 ```shell
-kubectl logs <deployer image>
+kubectl logs <deployer image> -n <namespace>
 
-ex. kubectl logs cloudbees-core-deployer-kqnr7
+ex. kubectl logs cloudbees-core-deployer-kqnr7 -n cloudbees-core
 ```
 
 ### Setup Wizard

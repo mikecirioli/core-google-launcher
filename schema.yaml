@@ -21,19 +21,19 @@ properties:
   cjocImage:
     type: string
     description: This is the CloudBees Core Operations Center image.
-    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable:2.176.3.2
+    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable:2.176
     x-google-marketplace:
       type: IMAGE
   mmImage:
     type: string
     description: This is the Jenkins Managed Master image.
-    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/cloudbees-core-mm:2.176.3.2
+    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/cloudbees-core-mm:2.176
     x-google-marketplace:
       type: IMAGE
   nginxIngressImage:
     type: string
     description: This is an image for the nginx ingress controller.
-    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/nginx-ingress-controller:0.23.0
+    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/nginx-ingress-controller:2.176
     x-google-marketplace:
       type: IMAGE
   nginxIngressServiceAccount:
@@ -164,12 +164,12 @@ properties:
         type: SSD
   imageUbbagent:
     type: string
-    default: gcr.io/cloud-marketplace-tools/metering/ubbagent:latest
+    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/ubbagent:2.176
     x-google-marketplace:
       type: IMAGE
   imageReportingFunction:
     type: string
-    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/reporting-function:latest
+    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/reporting-function:2.176
     x-google-marketplace:
       type: IMAGE
   reportingSecret:
@@ -196,12 +196,7 @@ properties:
 required:
 - name
 - namespace
-- cjocImage
-- mmImage
-- nginxIngressServiceAccount
-- operationsCenterServiceAccount
-- masterServiceAccount
-- ssd
+- ssd #TODO not only not required, but also not used?
 - numberOfUsers
 - customerFirstName
 - customerLastName
