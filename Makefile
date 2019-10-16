@@ -81,7 +81,7 @@ install-app-crd:
 
 # install CloudBees Core using mpdev:
 # https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md
-install: install-app-crd check-license-params
+install: install-app-crd deployer check-license-params
 	kubectl create namespace cloudbees-core || true \
 	&& mpdev install --deployer=$(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(DEPLOYER_TAG) \
 	--parameters='{"name": "$(NAME)", "namespace": "$(NAMESPACE)", "numberOfUsers": "$(NUMBER_OF_USERS)", \
