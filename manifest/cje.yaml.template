@@ -425,11 +425,13 @@ spec:
             failureThreshold: 12
         - name: reporting-function
           image: $imageReportingFunction
+          imagePullPolicy: "Always"
           volumeMounts:
           - name: reporting-function-config
             mountPath: /etc/reporting-function
         - name: ubbagent
           image: $imageUbbagent
+          imagePullPolicy: "Always"
           env:
           - name: AGENT_CONFIG_FILE
             value: "/etc/ubbagent/config.yaml"
@@ -438,12 +440,12 @@ spec:
           - name: AGENT_ENCODED_KEY
             valueFrom:
               secretKeyRef:
-                name: test-reporting-secret #$reportingSecret
+                name: $reportingSecret
                 key: reporting-key
           - name: AGENT_CONSUMER_ID
             valueFrom:
               secretKeyRef:
-                name: test-reporting-secret #$reportingSecret
+                name: $reportingSecret
                 key: consumer-id
           volumeMounts:
           - name: ubbagent-config
