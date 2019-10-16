@@ -18,7 +18,6 @@ data:
     jenkins.model.JenkinsLocationConfiguration.get().setUrl("https://$publicHost/cjoc");
 ---
 #registration-detail.json
-# Source: other crap
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -40,7 +39,6 @@ data:
     }
 ---
 #.cloudbees-referrer.txt
-# Source: even more other crap
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -56,7 +54,7 @@ data:
   .cloudbees-referrer.txt: |
     Core on Google Marketplace
 ---
-# Source: crap
+# init.groovy license installation script
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -91,10 +89,12 @@ data:
     import com.cloudbees.jenkins.plugins.license.nectar.EvaluationRegistrar;
 
     import groovy.transform.Field;
+    import org.apache.commons.io.IOUtils;
+
 
     //Field = Global scope
     @Field Logger LOGGER = Logger.getLogger("com.cloudbees.groovy");
-    LOGGER.info("MY CUSTOM GROOVY IS UP");
+    LOGGER.info("Installing license for Core on Google Marketplace");
 
     main();
 
@@ -137,9 +137,7 @@ data:
         Path registrationFilePath = Paths.get(jenkinsHome, "registration-detail.json");
 
         if(registrationFilePath.toFile().exists()) {
-            List<String> lines = Files.readAllLines(registrationFilePath);
-            String fullJson = lines.stream().collect(Collectors.joining());
-            return JSONObject.fromObject(fullJson);
+            return JSONObject.fromObject(IOUtils.toString(new FileInputStream(registrationFilePath.toFile()), "UTF-8"));
         } else {
             return null;
         }
