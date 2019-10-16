@@ -182,16 +182,16 @@ properties:
     default: 10
     minimum: 10
   customerFirstName:
-    title: Customers first name (for licensing)
+    title: Customer's first name (for licensing)
     type: string
   customerLastName:
-    title: Customers last name (for licensing)
+    title: Customer's last name (for licensing)
     type: string
   customerEmail:
-    title: Customers email address (for licensing)
+    title: Customer's email address (for licensing)
     type: string
   customerCompany:
-    title: Customers company name (for licensing)
+    title: Customer's company name (for licensing)
     type: string
 required:
 - name
