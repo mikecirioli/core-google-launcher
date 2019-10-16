@@ -14,7 +14,7 @@ DEPLOYER_IMAGE_NAME=deployer
 #Tags
 OC_MM_TAG=2.176.4.3
 NGINX_TAG=0.23.0
-DEPLOYER_TAG=latest
+DEPLOYER_TAG=2.176.4.3
 
 #Deployer params
 NAME=cloudbees-core
