@@ -12,9 +12,10 @@ NGINX_IMAGE_NAME=nginx-ingress-controller
 DEPLOYER_IMAGE_NAME=deployer
 
 #Tags
+RELEASE_TAG=2.176
+LATEST_TAG=latest
 OC_MM_TAG=2.176.4.3
 NGINX_TAG=0.23.0
-DEPLOYER_TAG=2.176.4.3
 
 #Deployer params
 NAME=cloudbees-core
@@ -39,9 +40,11 @@ check-license-params:
 # build/tag/push Deployer image
 .PHONY: deployer
 deployer:
-	docker build -t $(DEPLOYER_IMAGE_NAME):$(DEPLOYER_TAG) . \
-	&& docker tag $(DEPLOYER_IMAGE_NAME):$(DEPLOYER_TAG) $(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(DEPLOYER_TAG) \
-	&& docker push $(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(DEPLOYER_TAG)
+	docker build \
+	-t $(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(LATEST_TAG) \
+	-t $(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(RELEASE_TAG) .
+	docker push $(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(LATEST_TAG)
+	docker push $(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(RELEASE_TAG)
 
 # pull/tag/push CloudBees Core images
 core: core-oc core-mm core-nginx
@@ -49,20 +52,29 @@ core: core-oc core-mm core-nginx
 .PHONY: core-oc
 core-oc:
 	docker pull $(CORE_REGISTRY_PATH)/$(OC_IMAGE_NAME):$(OC_MM_TAG)
-	docker tag $(CORE_REGISTRY_PATH)/$(OC_IMAGE_NAME):$(OC_MM_TAG) $(GCR_REGISTRY_PATH):$(OC_MM_TAG)
+	docker tag $(CORE_REGISTRY_PATH)/$(OC_IMAGE_NAME):$(OC_MM_TAG) $(GCR_REGISTRY_PATH):$(LATEST_TAG)
+	docker tag $(CORE_REGISTRY_PATH)/$(OC_IMAGE_NAME):$(OC_MM_TAG) $(GCR_REGISTRY_PATH):$(RELEASE_TAG)
 	docker push $(GCR_REGISTRY_PATH):$(OC_MM_TAG)
+	docker push $(GCR_REGISTRY_PATH):$(LATEST_TAG)
+	docker push $(GCR_REGISTRY_PATH):$(RELEASE_TAG)
 
 .PHONY: core-mm
 core-mm:
 	docker pull $(CORE_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG)
-	docker tag $(CORE_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG) $(GCR_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG)
+	docker tag $(CORE_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG) $(GCR_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(LATEST_TAG)
+	docker tag $(CORE_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG) $(GCR_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(RELEASE_TAG)
 	docker push $(GCR_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(OC_MM_TAG)
+	docker push $(GCR_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(LATEST_TAG)
+	docker push $(GCR_REGISTRY_PATH)/$(MM_IMAGE_NAME):$(RELEASE_TAG)
 
 .PHONY: core-nginx
 core-nginx:
 	docker pull $(NGINX_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG)
-	docker tag $(NGINX_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG) $(GCR_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG)
+	docker tag $(NGINX_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG) $(GCR_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(LATEST_TAG)
+	docker tag $(NGINX_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG) $(GCR_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(RELEASE_TAG)
 	docker push $(GCR_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(NGINX_TAG)
+	docker push $(GCR_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(LATEST_TAG)
+	docker push $(GCR_REGISTRY_PATH)/$(NGINX_IMAGE_NAME):$(RELEASE_TAG)
 
 # create a new cluster
 .PHONY: cluster
@@ -83,7 +95,7 @@ install-app-crd:
 # https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md
 install: install-app-crd deployer check-license-params
 	kubectl create namespace cloudbees-core || true \
-	&& mpdev install --deployer=$(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(DEPLOYER_TAG) \
+	&& mpdev install --deployer=$(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(RELEASE_TAG) \
 	--parameters='{"name": "$(NAME)", "namespace": "$(NAMESPACE)", "numberOfUsers": "$(NUMBER_OF_USERS)", \
 	"customerFirstName": "$(CUSTOMER_FIRST_NAME)", "customerLastName": "$(CUSTOMER_LAST_NAME)", \
 	"customerEmail": "$(CUSTOMER_EMAIL)", "customerCompany": "$(CUSTOMER_COMPANY)", \
