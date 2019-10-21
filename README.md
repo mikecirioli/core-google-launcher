@@ -23,54 +23,67 @@ gcloud auth login
 ```
 ## Google Container Registry (GCR)
 
-A [Makefile](https://github.com/cloudbees/core-google-launcher/blob/master/Makefile) is included, which uses Google Container Registry (GCR). Ensure that GCR is enabled for your project.
-
-[Enable the GCR API](https://console.cloud.google.com/apis/library/containerregistry.googleapis.com)
+A `Makefile` is included which pushes Docker images Google Container Registry (GCR). Ensure that GCR is enabled for your project by navigating to [GCR](https://console.cloud.google.com/apis/library/containerregistry.googleapis.com) and activating it if it's not already activated.
 
 The `Makefile` references GCR by project name. Set an environment variable for your GCP project:
 
 `export GCP_PROJECT=my-gcp-project`
 
-## Publishing CloudBees Core Images
-CloudBees Core images must be published to gcr.io, as they are referenced by the deployer image below.
+The `Makefile` tags images before pushing them to GCR. Most images have unique tags, but the `RELEASE_TAG` is applied to all images and must be set as an environment variable:
+
+`export RELEASE_TAG=2.176`
+
+**Important**: `schema.yaml` contains default values for Docker image locations and tags, and these values are used as-is during the deployment. To use custom-built images, update the Docker image locations in `schema.yaml` manually prior to installing CloudBees Core.
+
+## Publish All Images
+
+Run `make` to publish all images.
+
+## Publish CloudBees Core Images (Optional)
 
 Run `make core` to pull/tag/push CloudBees Core Docker images.
 
-## Publishing Marketplace-specific Images
+## Publish Marketplace-specific Images (Optional)
 
 Run `make ubbagent` to publish Google's Usage-based billing agent ("ubbagent").
 
-## Build and publish the Deployer Image
-Build and publish the Deployer [Dockerfile](https://github.com/cloudbees/core-google-launcher/blob/master/Dockerfile) with `make deployer`.
+Note: `imageReportingFunction` is a marketplace-specific image that's published separately by CloudBees.
+
+## Build and publish the Deployer Image (Optional)
+
+Build and publish the deployer `Dockerfile` with `make deployer`.
+
+Note: the deployer image must be rebuilt every time deployment code changes. For convenience, the deployer image is rebuilt by `make install`, discussed below.
 
 ## Create Your Cluster
 If you are new to GKE, see [Getting Started](https://cloud.google.com/kubernetes-engine/docs/how-to/creating-a-cluster) to create your first cluster.
 
-The following commands create a right-sized GKE cluster and install the [Application](https://github.com/kubernetes-sigs/application) Custom Resource Definition (CRD):
+The following command automatically creates a GKE cluster and updates your `kubectl` configuration to point to the newly created cluster:
 
 ```shell
 make cluster
 ```
 
-Note: the Application CRD is required to deploy CloudBees Core.
+Note: the [Application](https://github.com/kubernetes-sigs/application) Custom Resource Definition (CRD) must be installed in the cluster for the deployment to work. It is installed automatically with the `make install` command, discussed below.
 
 ## Install CloudBees Core on Your Cluster
 
-### Set required licensing paramters
+### Set required licensing parameters
+
 The following environment variables need to be set (or passed to `make`):
 - CUSTOMER_FIRST_NAME  -  _Your first name_
 - CUSTOMER_LAST_NAME  -  _Your last name_
 - CUSTOMER_EMAIL  -  _Your email address_
 - CUSTOMER_COMPANY  -  _Your company name_
 
-### Use MPDEV to Install and Test the Deployer Image
+### Use `mpdev` to Install and Test the Deployer Image
 Install `mpdev` by using the following [instructions](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md).
 
 To install CloudBees Core using `mpdev`, run `make install`.
 
 Watch the installation proceed using `kubectl get po -w -n cloudbees-core`.
 
-The installation is complete when the status of the deployer image is `Completed`, but pay attention to the status of the other pods. The deployer running to completion doesn't always mean the install was successful.
+The installation is complete when the status of the deployer image is `Completed`, but be mindful of the status of the other pods. The deployer running to completion doesn't always mean the install was successful. The installation is (generally) successful when the deployer image is `Completed` and there are 3/3 containers running in the `cjoc-0` pod.
 
 To view logs for the deployment:
 
@@ -120,11 +133,6 @@ The installation configures a self-signed certificate. To configure your own SSL
 * [CloudBees Core Reference Architecture](https://go.cloudbees.com/docs/cloudbees-core/cloud-reference-architecture/)
 
 * [Solution Brief](https://pages.cloudbees.com/l/272242/2018-06-26/9sjwj/272242/54721/cloudbees_core.pdf)
-
-## Licensing
-A 15-day free trial license is available via the "Request a Trial" button in the Getting Started wizard, however an Internet connection is required to use this option.
-
-If an offline license is needed, send an email to sales@cloudbees.com.
 
 ## CloudBees Support
 To get Support from CloudBees, [visit the CloudBees Support page](https://support.cloudbees.com/hc/en-us/requests).
