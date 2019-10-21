@@ -13,7 +13,6 @@ DEPLOYER_IMAGE_NAME=deployer
 UBBAGENT_IMAGE_NAME=ubbagent
 
 #Tags
-RELEASE_TAG=2.176
 LATEST_TAG=latest
 OC_MM_TAG=2.176.4.3
 NGINX_TAG=0.23.0
@@ -29,12 +28,13 @@ CLUSTER_NAME=cloudbees-core-marketplace
 REGION=us-east4
 
 # pull/tag/push Core images, build/tag/push Deployer image
-all: check-make-params core deployer
+all: check-make-params core ubbagent deployer
 
 # These parameters are required for `make`
 .PHONY: check-make-params
 check-make-params:
 	@test -n "$(GCP_PROJECT)" || (echo 'GCP_PROJECT must be set' && exit 1)
+	@test -n "$(RELEASE_TAG)" || (echo 'RELEASE_TAG must be set' && exit 1)
 
 # These parameters are required for CJOC licensing
 .PHONY: check-license-params
