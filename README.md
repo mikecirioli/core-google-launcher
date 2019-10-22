@@ -21,6 +21,7 @@ gcloud config set compute/zone <zone>
 gcloud config set account <user>
 gcloud auth login
 ```
+
 ## Google Container Registry (GCR)
 
 A `Makefile` is included which pushes Docker images Google Container Registry (GCR). Ensure that GCR is enabled for your project by navigating to [GCR](https://console.cloud.google.com/apis/library/containerregistry.googleapis.com) and activating it if it's not already activated.
@@ -29,31 +30,31 @@ The `Makefile` references GCR by project name. Set an environment variable for y
 
 `export GCP_PROJECT=my-gcp-project`
 
-The `Makefile` tags images before pushing them to GCR. Most images have unique tags, but the `RELEASE_TAG` is applied to all images and must be set as an environment variable:
+The `Makefile` tags images before pushing them to GCR. Most images have unique tags, but a `RELEASE_TAG` is shared across all images and must be set as an environment variable:
 
 `export RELEASE_TAG=2.176`
 
-**Important**: `schema.yaml` contains default values for Docker image locations and tags, and these values are used as-is during the deployment. To use custom-built images, update the Docker image locations in `schema.yaml` manually prior to installing CloudBees Core.
+**Important**: `schema.yaml` contains default values for Docker image locations and tags, and these values are used as-is during the deployment. While not required, it is possible to publish CloudBees Core images to your own registry and use them during the deployment. To use your own images, follow the optional publishing steps below, then manually update the Docker image references in `schema.yaml` prior to installation.
 
-## Publish All Images
+## Publish All Images (Optional)
 
 Run `make` to publish all images.
 
 ## Publish CloudBees Core Images (Optional)
 
-Run `make core` to pull/tag/push CloudBees Core Docker images.
+Run `make core` to pull/tag/push [CloudBees Core Docker images](https://hub.docker.com/u/cloudbees).
 
 ## Publish Marketplace-specific Images (Optional)
 
-Run `make ubbagent` to publish Google's Usage-based billing agent ("ubbagent").
+Run `make ubbagent` to publish Google's [Usage-based billing agent](https://github.com/GoogleCloudPlatform/ubbagent) ("ubbagent").
 
-Note: `imageReportingFunction` is a marketplace-specific image that's published separately by CloudBees.
+**Note**: `imageReportingFunction` is a marketplace-specific image that's published separately by CloudBees.
 
 ## Build and publish the Deployer Image (Optional)
 
 Build and publish the deployer `Dockerfile` with `make deployer`.
 
-Note: the deployer image must be rebuilt every time deployment code changes. For convenience, the deployer image is rebuilt by `make install`, discussed below.
+**Note**: the deployer image must be built every time deployment code changes. For convenience, the deployer image is built by `make install`, discussed below.
 
 ## Create Your Cluster
 If you are new to GKE, see [Getting Started](https://cloud.google.com/kubernetes-engine/docs/how-to/creating-a-cluster) to create your first cluster.
@@ -64,13 +65,13 @@ The following command automatically creates a GKE cluster and updates your `kube
 make cluster
 ```
 
-Note: the [Application](https://github.com/kubernetes-sigs/application) Custom Resource Definition (CRD) must be installed in the cluster for the deployment to work. It is installed automatically with the `make install` command, discussed below.
+**Note**: the [Application](https://github.com/kubernetes-sigs/application) Custom Resource Definition (CRD) is required to install CloudBees Core. It is installed automatically with the `make install` command, discussed below.
 
 ## Install CloudBees Core on Your Cluster
 
 ### Set required licensing parameters
 
-The following environment variables need to be set (or passed to `make`):
+The following environment variables need to be set:
 - CUSTOMER_FIRST_NAME  -  _Your first name_
 - CUSTOMER_LAST_NAME  -  _Your last name_
 - CUSTOMER_EMAIL  -  _Your email address_
@@ -81,9 +82,9 @@ Install `mpdev` by using the following [instructions](https://github.com/GoogleC
 
 To install CloudBees Core using `mpdev`, run `make install`.
 
-Watch the installation proceed using `kubectl get po -w -n cloudbees-core`.
+When the `mpdev` command is finished, watch the installation proceed using `kubectl get po -w -n cloudbees-core`.
 
-The installation is complete when the status of the deployer image is `Completed`, but be mindful of the status of the other pods. The deployer running to completion doesn't always mean the install was successful. The installation is (generally) successful when the deployer image is `Completed` and there are 3/3 containers running in the `cjoc-0` pod.
+The installation is complete when the status of the deployer image is `Completed`, but be mindful of the status of the other pods. The deployer running to completion doesn't always mean the install was successful. The installation is (generally) successful when the deployer image status is `Completed` and there are 3/3 containers running in the `cjoc-0` pod.
 
 To view logs for the deployment:
 
@@ -101,7 +102,8 @@ kubectl get ingress -n <namespace> | grep cjoc
 
 ex. kubectl get ingress -n cloudbees-core | grep cjoc
 ```
-Paste the domain name listed into your browser to go to the CloudBees Core Operations Center and start the setup process. Or you can click on the Endpoints link under Kubernetes Engine > Services in the GCP console.
+
+Paste the domain name listed into your browser to go to CloudBees Core Operations Center and start the setup process. Or you can click on the Endpoints link under Kubernetes Engine > Services in the GCP console.
 
 The installation process requires an initial admin password. Execute this command to get it:
 
