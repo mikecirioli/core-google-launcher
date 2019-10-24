@@ -17,6 +17,132 @@ data:
     hudson.ExtensionList.lookupSingleton(com.cloudbees.jenkins.support.impl.cloudbees.TcpSlaveAgentListenerMonitor.class).disable(true)
     jenkins.model.JenkinsLocationConfiguration.get().setUrl("https://$publicHost/cjoc");
 ---
+#registration-detail.json
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cjoc-registration-detail-json
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: cjoc-registration-detail-json-config-map
+    app: cjoc
+    chart: "cloudbees-core-3.4.0"
+    release: "cloudbees-core"
+    heritage: "Tiller"
+data:
+  registration-detail.json: |
+    {
+      "firstname": "$customerFirstName",
+      "lastname": "$customerLastName",
+      "email": "$customerEmail",
+      "company": "$customerCompany"
+    }
+---
+#.cloudbees-referrer.txt
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cjoc-cloudbees-referrer-txt
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: cjoc-cloudbees-referrer-txt-config-map
+    app: cjoc
+    chart: "cloudbees-core-3.4.0"
+    release: "cloudbees-core"
+    heritage: "Tiller"
+data:
+  .cloudbees-referrer.txt: |
+    Core on Google Marketplace
+---
+# init.groovy license installation script
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cjoc-install-license-groovy
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: cjoc-install-license-groovy-config-map
+    app: cjoc
+    chart: "cloudbees-core-3.4.0"
+    release: "cloudbees-core"
+    heritage: "Tiller"
+data:
+  init.groovy: |
+    import com.cloudbees.opscenter.server.license.OperationsCenterEvaluationRegistrar;
+
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.nio.file.Paths;
+    import java.util.List;
+    import java.util.concurrent.ExecutionException;
+    import java.util.logging.Logger;
+    import java.util.stream.Collectors;
+    import javax.servlet.ServletException;
+
+    import net.sf.json.JSONObject;
+
+    import hudson.license.LicenseManager;
+
+    import jenkins.plugins.asynchttpclient.AHC;
+
+    import com.cloudbees.jenkins.plugins.license.JenkinsHelper;
+    import com.cloudbees.jenkins.plugins.license.nectar.EvaluationRegistrar;
+
+    import groovy.transform.Field;
+    import org.apache.commons.io.IOUtils;
+
+
+    //Field = Global scope
+    @Field Logger LOGGER = Logger.getLogger("com.cloudbees.groovy");
+    LOGGER.info("Installing license for Core on Google Marketplace");
+
+    main();
+
+    //All code is in methods, so no surprises with lonely lines somewhere.
+    def main() {
+
+        if (LicenseManager.getConfigFile().exists()) {
+            LOGGER.info("LICENSE EXISTS");
+
+        } else {
+            LOGGER.info("LICENSE NOT THERE, request for a Trial one.");
+            JSONObject json = getRegistrationJSONObject();
+
+            if(json != null){
+
+                String company = json.get("company").toString();
+                String email = json.get("email").toString();
+                String firstname = json.get("firstname").toString();
+                String lastname = json.get("lastname").toString();
+                String productCode = OperationsCenterEvaluationRegistrar.EVAL_EDITION_MULTI_MASTER_SOURCE_TRIAL;
+
+                requestTrialLicenseWithWizardCode(firstname,lastname,email,company,productCode,false,true);
+            } else {
+                LOGGER.info("WARNING:registration-detail.json Not Found.");
+            }
+            
+        }
+
+    }
+
+    //Use the same classes as the one used by the wizard to get the Trial
+    def requestTrialLicenseWithWizardCode(firstname,lastname,email,company,productCode,subscribe,agree) { 
+        EvaluationRegistrar registrar = new OperationsCenterEvaluationRegistrar(null, null, null, null, true, false, null);
+        registrar.register(firstname,lastname,email,company,subscribe,agree,productCode);
+    }
+
+    //Read customer data from JENKINS_HOME/registration-detail.json
+    def getRegistrationJSONObject() {
+        String jenkinsHome = JenkinsHelper.getInstance().getRootDir().toString();
+        Path registrationFilePath = Paths.get(jenkinsHome, "registration-detail.json");
+
+        if(registrationFilePath.toFile().exists()) {
+            return JSONObject.fromObject(IOUtils.toString(new FileInputStream(registrationFilePath.toFile()), "UTF-8"));
+        } else {
+            return null;
+        }
+    }
+---
 # Source: cloudbees-core/templates/cjoc-jenkins-agent.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -271,13 +397,24 @@ spec:
             requests:
               cpu: "1"
               memory: "1G"
-
           volumeMounts:
             - name: jenkins-home
               mountPath: /var/jenkins_home
               readOnly: false
             - name: jenkins-configure-jenkins-groovy
               mountPath: /var/jenkins_config/configure-jenkins.groovy.d
+              readOnly: true
+            - name: jenkins-registration-detail-json
+              mountPath: /var/jenkins_home/registration-detail.json
+              subPath: registration-detail.json
+              readOnly: true
+            - name: jenkins-cloudbees-referrer-txt
+              mountPath: /var/jenkins_home/.cloudbees-referrer.txt
+              subPath: .cloudbees-referrer.txt
+              readOnly: true
+            - name: jenkins-install-license-groovy
+              mountPath: /var/jenkins_home/init.groovy
+              subPath: init.groovy
               readOnly: true
           livenessProbe:
             httpGet:
@@ -286,10 +423,52 @@ spec:
             initialDelaySeconds: 300
             timeoutSeconds: 5
             failureThreshold: 12
+        - name: reporting-function
+          image: $imageReportingFunction
+          imagePullPolicy: "Always"
+          volumeMounts:
+          - name: reporting-function-config
+            mountPath: /etc/reporting-function
+        - name: ubbagent
+          image: $imageUbbagent
+          imagePullPolicy: "Always"
+          env:
+          - name: AGENT_CONFIG_FILE
+            value: "/etc/ubbagent/config.yaml"
+          - name: AGENT_LOCAL_PORT
+            value: "4567"
+          - name: AGENT_ENCODED_KEY
+            valueFrom:
+              secretKeyRef:
+                name: $reportingSecret
+                key: reporting-key
+          - name: AGENT_CONSUMER_ID
+            valueFrom:
+              secretKeyRef:
+                name: $reportingSecret
+                key: consumer-id
+          volumeMounts:
+          - name: ubbagent-config
+            mountPath: /etc/ubbagent
       volumes:
         - name: jenkins-configure-jenkins-groovy
           configMap:
             name: cjoc-configure-jenkins-groovy
+        - name: ubbagent-config
+          configMap:
+            name: ubbagent-config
+        - name: reporting-function-config
+          configMap:
+            name: reporting-function-config
+        - name: jenkins-registration-detail-json
+          configMap:
+            name:  cjoc-registration-detail-json
+        - name: jenkins-cloudbees-referrer-txt
+          configMap:
+            name:  cjoc-cloudbees-referrer-txt
+        - name: jenkins-install-license-groovy
+          configMap:
+            name:  cjoc-install-license-groovy
   volumeClaimTemplates:
     - metadata:
         name: jenkins-home
@@ -303,6 +482,95 @@ spec:
         resources:
           requests:
             storage: "20Gi"
----
-# Source: cloudbees-core/templates/route.yaml
 
+#reporting function config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reporting-function-config
+data:
+  config.json: |
+    { "number-of-users": $numberOfUsers}
+
+#ubbagent config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubbagent-config
+data:
+  config.yaml: |
+    # The identity section contains authentication information used
+    # by the agent.
+    identities:
+    - name: gcp
+      gcp:
+        # This parameter accepts a base64-encoded JSON service
+        # account key. The value comes from the reporting secret.
+        encodedServiceAccountKey: $AGENT_ENCODED_KEY
+
+    # The metrics section defines the metric that will be reported.
+    # Metric names should match verbatim the identifiers created
+    # during pricing setup.
+    metrics:
+    - name: user
+      type: int
+
+      # The endpoints section of a metric defines which endpoints the
+      # metric data is sent to.
+      endpoints:
+      - name: on_disk
+      - name: servicecontrol
+
+      # The aggregation section indicates that reports that the agent
+      # receives for this metric should be aggregated for a specified
+      # period of time prior to being sent to the reporting endpoint.
+      aggregation:
+        bufferSeconds: 60
+
+    - name: instance_time
+      type: int
+      endpoints:
+      - name: on_disk
+      - name: servicecontrol
+
+      # The passthrough marker indicates that no aggregation should
+      # occur for this metric. Reports received are immediately sent
+      # to the reporting endpoint. We use passthrough for the
+      # instance_time metric since reports are generated
+      # automatically by a heartbeat source defined in a later
+      # section.
+      passthrough: {}
+
+    # The endpoints section defines where metering data is ultimately
+    # sent. Currently supported endpoints include:
+    # * disk - some directory on the local filesystem
+    # * servicecontrol - Google Service Control
+    endpoints:
+    - name: on_disk
+      # The disk endpoint is useful for debugging, but its inclusion
+      # is not necessary in a production deployment.
+      disk:
+        reportDir: /var/lib/ubbagent/reports
+        expireSeconds: 3600
+    - name: servicecontrol
+      servicecontrol:
+        identity: gcp
+        # The service name is unique to your application and will be
+        # provided during onboarding.
+        serviceName: cloudbees-core-billable.mp-cloudbees.appspot.com
+        consumerId: $AGENT_CONSUMER_ID  # From the reporting secret.
+
+    # The sources section lists metric data sources run by the agent
+    # itself. The currently-supported source is 'heartbeat', which
+    # sends a defined value to a metric at a defined interval. In
+    # this example, the heartbeat sends a 60-second value through the
+    # "instance_time" metric every minute.
+    sources:
+    - name: instance_time_heartbeat
+      heartbeat:
+        metric: instance_time
+        intervalSeconds: 60
+        value:
+          int64Value: 60
