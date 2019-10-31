@@ -1,0 +1,199 @@
+application_api_version: v1beta1
+properties:
+  name:
+    type: string
+    x-google-marketplace:
+     type: NAME
+  namespace:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  publicHost:
+    type: string
+    title: Public host name (ON-PREMISE ONLY)
+    description: Must be a valid DNS name. For IP addresses add beesdns.com. eg. 139.178.70.46.beesdns.com This is only required for on-premise only. For cloud GKE, skip this field and this is assigned automatically.
+    pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$
+  loadBalancerIp:
+    type: string
+    title: Load balancer IP (ON-PREMISE ONLY)
+    description: This is only required for on-premise only. For cloud GKE, skip this field and this is assigned automatically.
+    pattern: ^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$
+  cjocImage:
+    type: string
+    description: This is the CloudBees Core Operations Center image.
+    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable:2.176
+    x-google-marketplace:
+      type: IMAGE
+  mmImage:
+    type: string
+    description: This is the Jenkins Managed Master image.
+    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/cloudbees-core-mm:2.176
+    x-google-marketplace:
+      type: IMAGE
+  nginxIngressImage:
+    type: string
+    description: This is an image for the nginx ingress controller.
+    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/nginx-ingress-controller:2.176
+    x-google-marketplace:
+      type: IMAGE
+  nginxIngressServiceAccount:
+    title: NGINX Ingress Service account name
+    type: string
+    description: This is the name of the ServiceAccount that is used to deploy the NGINX Ingress Controller.
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+          - type: Role
+            rulesType: CUSTOM
+            rules:
+              - apiGroups: [""]
+                resources: ["namespaces"]
+                verbs: ["get"]
+              - apiGroups: [""]
+                resources: ["configmaps", "pods", "secrets", "endpoints"]
+                verbs: ["get", "list", "watch"]
+              - apiGroups: [""]
+                resources: ["services"]
+                verbs: ["get", "list", "update", "watch"]
+              - apiGroups: ["extensions"]
+                resources: ["ingresses"]
+                verbs: ["get", "list", "watch"]
+              - apiGroups: ["extensions"]
+                resources: ["ingresses/status"]
+                verbs: ["update"]
+              - apiGroups: [""]
+                resourceNames: ["ingress-controller-leader-nginx"]
+                resources: ["configmaps"]
+                verbs: ["get", "update"]
+              - apiGroups: [""]
+                resources: ["configmaps"]
+                verbs: ["create"]
+              - apiGroups: [""]
+                resources: ["endpoints"]
+                verbs: ["create", "get", "update"]
+              - apiGroups: [""]
+                resources: ["events"]
+                verbs: ["create", "patch"]
+          - type: ClusterRole
+            rulesType: CUSTOM
+            rules:
+              - apiGroups: [""]
+                resources: ["configmaps", "endpoints", "nodes", "pods", "secrets"]
+                verbs: ["list", "watch"]
+              - apiGroups: [""]
+                resources: ["nodes"]
+                verbs: ["get"]
+              - apiGroups: [""]
+                resources: ["services"]
+                verbs: ["get", "list", "watch"]
+              - apiGroups: [""]
+                resources: ["events"]
+                verbs: ["create", "update"]
+              - apiGroups: ["extensions", "networking.k8s.io"]
+                resources: ["ingresses"]
+                verbs: ["get", "list", "watch"]
+              - apiGroups: ["extensions", "networking.k8s.io"]
+                resources: ["ingresses/status"]
+                verbs: ["update"]
+  operationsCenterServiceAccount:
+    title: Operations Center Service account name
+    type: string
+    description: This is the name of the ServiceAccount that is used to deploy CloudBees Core Operations Center.
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+        - type: Role
+          rulesType: CUSTOM
+          rules:
+            - apiGroups: [""]
+              resources: ["pods"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: [""]
+              resources: ["pods/exec"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: [""]
+              resources: ["pods/log"]
+              verbs: ["get","list","watch"]
+            - apiGroups: ["apps"]
+              resources: ["statefulsets"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: [""]
+              resources: ["services"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: [""]
+              resources: ["persistentvolumeclaims"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: ["extensions"]
+              resources: ["ingresses"]
+              verbs: ["create","delete","get","list","patch","update","watch"]
+            - apiGroups: [""]
+              resources: ["secrets"]
+              verbs: ["list"]
+            - apiGroups: [""]
+              resources: ["events"]
+              verbs: ["get","list","watch"]
+  masterServiceAccount:
+    title: Managed Master Service account name
+    type: string
+    description: This is the name of the ServiceAccount that is used to deploy CloudBees Core Managed Masters.
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+          - type: Role
+            rulesType: CUSTOM
+            rules:
+              - apiGroups: [""]
+                resources: ["pods"]
+                verbs: ["create","delete","get","list","patch","update","watch"]
+              - apiGroups: [""]
+                resources: ["pods/exec"]
+                verbs: ["create","delete","get","list","patch","update","watch"]
+              - apiGroups: [""]
+                resources: ["pods/log"]
+                verbs: ["get","list","watch"]
+  imageUbbagent:
+    type: string
+    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/ubbagent:2.176
+    x-google-marketplace:
+      type: IMAGE
+  imageReportingFunction:
+    type: string
+    default: gcr.io/cje-marketplace-dev/cloudbees-core-billable/reporting-function:2.176
+    x-google-marketplace:
+      type: IMAGE
+  reportingSecret:
+    type: string
+    x-google-marketplace:
+      type: REPORTING_SECRET
+  numberOfUsers:
+    title: Number of Users
+    type: integer
+    default: 10
+    minimum: 10
+  customerFirstName:
+    title: Customer's first name (for licensing)
+    type: string
+    default: Thomas
+  customerLastName:
+    title: Customer's last name (for licensing)
+    type: string
+    default: Tester
+  customerEmail:
+    title: Customer's email address (for licensing)
+    type: string
+    default: test@test.com
+  customerCompany:
+    title: Customer's company name (for licensing)
+    type: string
+    default: We love to test!
+required:
+- name
+- namespace
+- numberOfUsers
+- customerFirstName
+- customerLastName
+- customerEmail
+- customerCompany
