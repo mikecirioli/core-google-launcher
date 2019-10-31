@@ -386,6 +386,7 @@ spec:
                 -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImageName="CloudBees Core - Managed Master - 2.176.4.3"
                 -Dcom.cloudbees.jce.masterprovisioning.DockerImageDefinitionConfiguration.masterImage=$mmImage
                 -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.serviceAccount=$masterServiceAccount
+                -Dhudson.DNSMultiCast.disabled=true
           ports:
             - containerPort: 8080
               name: http
@@ -520,7 +521,6 @@ data:
       # The endpoints section of a metric defines which endpoints the
       # metric data is sent to.
       endpoints:
-      - name: on_disk
       - name: servicecontrol
 
       # The aggregation section indicates that reports that the agent
@@ -529,31 +529,11 @@ data:
       aggregation:
         bufferSeconds: 60
 
-    - name: instance_time
-      type: int
-      endpoints:
-      - name: on_disk
-      - name: servicecontrol
-
-      # The passthrough marker indicates that no aggregation should
-      # occur for this metric. Reports received are immediately sent
-      # to the reporting endpoint. We use passthrough for the
-      # instance_time metric since reports are generated
-      # automatically by a heartbeat source defined in a later
-      # section.
-      passthrough: {}
-
     # The endpoints section defines where metering data is ultimately
     # sent. Currently supported endpoints include:
     # * disk - some directory on the local filesystem
     # * servicecontrol - Google Service Control
     endpoints:
-    - name: on_disk
-      # The disk endpoint is useful for debugging, but its inclusion
-      # is not necessary in a production deployment.
-      disk:
-        reportDir: /var/lib/ubbagent/reports
-        expireSeconds: 3600
     - name: servicecontrol
       servicecontrol:
         identity: gcp
@@ -561,16 +541,3 @@ data:
         # provided during onboarding.
         serviceName: cloudbees-core-billable.mp-cloudbees.appspot.com
         consumerId: $AGENT_CONSUMER_ID  # From the reporting secret.
-
-    # The sources section lists metric data sources run by the agent
-    # itself. The currently-supported source is 'heartbeat', which
-    # sends a defined value to a metric at a defined interval. In
-    # this example, the heartbeat sends a 60-second value through the
-    # "instance_time" metric every minute.
-    sources:
-    - name: instance_time_heartbeat
-      heartbeat:
-        metric: instance_time
-        intervalSeconds: 60
-        value:
-          int64Value: 60
