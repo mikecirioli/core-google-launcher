@@ -164,7 +164,9 @@ else
   deploy_gke_op
 fi
 
-sleep 20
+sleep 180
+
+# add some actual tests here
 
 patch_assembly_phase.sh --status="Success"
 
