@@ -1,6 +1,3 @@
-#GCP_PROJECT=cloud-bill-dev
-GCP_PROJECT=cjp-marketplace-dev
-
 #Registries
 GCR_REGISTRY_PATH=gcr.io/$(GCP_PROJECT)/cloudbees-core-billable
 CORE_REGISTRY_PATH=cloudbees
@@ -123,7 +120,7 @@ install: install-app-crd deployer check-license-params
 	--parameters='{"name": "$(NAME)", "namespace": "$(NAMESPACE)", "numberOfUsers": "$(NUMBER_OF_USERS)", \
 	"customerFirstName": "$(CUSTOMER_FIRST_NAME)", "customerLastName": "$(CUSTOMER_LAST_NAME)", \
 	"customerEmail": "$(CUSTOMER_EMAIL)", "customerCompany": "$(CUSTOMER_COMPANY)", \
-	"reportingSecret": ""}'
+	"reportingSecret": "gs://cloud-marketplace-tools/reporting_secrets/fake_reporting_secret.yaml"}'
 
 uninstall:
 	kubectl delete ns cloudbees-core
