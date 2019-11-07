@@ -12,7 +12,9 @@ RUN apt-get -y install openssl
 
 COPY deployer/create_manifests.sh /bin/
 COPY deployer/deploy.sh /bin/
+COPY deployer/deploy_with_tests.sh /bin/
 COPY schema.yaml /data/
+COPY schema-test.yaml /data/schema.yaml
 COPY server.config /data/
 COPY manifest /data/manifest
 COPY manifest-ingress /data/manifest-ingress
