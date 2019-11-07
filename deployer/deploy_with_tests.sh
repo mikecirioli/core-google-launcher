@@ -164,9 +164,48 @@ else
   deploy_gke_op
 fi
 
-sleep 180
+cjoc_external_ip=""
+max_retries=10
+retry_count=0
+
+echo "lets check for ingress"
+
+#while [ -z $cjoc_external_ip ] && [ $retry_count -lt $max_retries ]; do
+while [ -z $cjoc_external_ip ] && [ $retry_count -lt $max_retries ]; do
+#  ((retry_count++))
+  let "retry_count=retry_count+1"
+  echo "Waiting for ingress..."
+  cjoc_external_ip=$(kubectl get ingress | grep cjoc | awk '{ print $2 }')
+  [ -z $cjoc_external_ip ] && sleep 10
+done
+cjoc_url="https://$cjoc_external_ip/cjoc/login?from=%2Fcjoc%2Fteams-check%2F"
+#cjoc_url="https://$INGRESS_IP/cjoc/login?from=%2Fcjoc%2Fteams-check%2F"
+
+echo "End point url:  $cjoc_url"
 
 # add some actual tests here
+output=""
+retry_count=0
+while [ -z $output ] && [ $retry_count -lt $max_retries ]; do
+  let "retry_count=retry_count+1"
+  echo "checking cjoc"
+  output=$(curl -L --silent --insecure "$cjoc_url" )
+  if [[ $output == *"Unlock CloudBees Core Cloud Operations Center"* ]]; then
+    echo "found it this time"
+    break
+  fi
+  output=""
+  echo "sleeping......"
+  sleep 20
+done
+
+echo "tried for $retry_count times" 
+
+if [[ $output != *"Unlock CloudBees Core Cloud Operations Center"* ]]; then
+  echo "unable to access jenkins at $cjoc_url"
+  exit 1
+fi
+
 
 patch_assembly_phase.sh --status="Success"
 
