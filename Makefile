@@ -114,13 +114,16 @@ install-app-crd:
 
 # install CloudBees Core using mpdev:
 # https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/docs/mpdev-references.md
-install: install-app-crd deployer check-license-params
+install: check-license-params install-app-crd deployer
 	kubectl create namespace cloudbees-core || true \
 	&& mpdev install --deployer=$(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(RELEASE_TAG) \
 	--parameters='{"name": "$(NAME)", "namespace": "$(NAMESPACE)", "numberOfUsers": "$(NUMBER_OF_USERS)", \
 	"customerFirstName": "$(CUSTOMER_FIRST_NAME)", "customerLastName": "$(CUSTOMER_LAST_NAME)", \
 	"customerEmail": "$(CUSTOMER_EMAIL)", "customerCompany": "$(CUSTOMER_COMPANY)", \
 	"reportingSecret": "gs://cloud-marketplace-tools/reporting_secrets/fake_reporting_secret.yaml"}'
+
+verify: check-make-params install-app-crd deployer
+	mpdev verify --deployer=$(GCR_REGISTRY_PATH)/$(DEPLOYER_IMAGE_NAME):$(RELEASE_TAG)
 
 uninstall:
 	kubectl delete ns cloudbees-core

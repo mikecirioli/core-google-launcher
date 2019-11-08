@@ -206,7 +206,6 @@ if [[ $output != *"Unlock CloudBees Core Cloud Operations Center"* ]]; then
   exit 1
 fi
 
-
 patch_assembly_phase.sh --status="Success"
 
 clean_iam_resources.sh
